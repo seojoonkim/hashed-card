@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hashed.Live</title>
+  <script>
+    // /simon → /#card/simon 으로 리다이렉트
+    const path = window.location.pathname;
+    
+    // GitHub Pages repo path (커스텀 도메인 사용시 빈 문자열)
+    const isCustomDomain = window.location.hostname === 'hashed.live';
+    const repo = isCustomDomain ? '' : '/hashed-card';
+    
+    // repo 경로 제거 후 프로필 ID 추출
+    let profileId = path.replace(repo, '').replace(/^\/+/, '').replace(/\/+$/, '');
+    
+    if (profileId && profileId !== '') {
+      // 프로필 카드 페이지로 리다이렉트
+      window.location.replace((isCustomDomain ? '' : repo) + '/#card/' + profileId);
+    } else {
+      // 메인 페이지로 리다이렉트
+      window.location.replace((isCustomDomain ? '/' : repo + '/'));
+    }
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
