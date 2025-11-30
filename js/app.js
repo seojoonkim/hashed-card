@@ -25,10 +25,6 @@ async function handleRoute() {
 
 // ==================== Init ====================
 async function initApp() {
-  console.log('[Init] Starting app...');
-  console.log('[Init] Path:', window.location.pathname);
-  console.log('[Init] Hash:', window.location.hash);
-  
   $('#app').innerHTML = `
     <div class="min-h-screen flex items-center justify-center bg-zinc-50">
       <div class="w-8 h-8 border-2 border-zinc-200 border-t-zinc-800 rounded-full animate-spin"></div>
@@ -38,10 +34,7 @@ async function initApp() {
   
   // 프로필 경로가 있으면 먼저 카드 뷰 표시
   const profileId = getProfileIdFromPath();
-  console.log('[Init] Profile ID from path:', profileId);
-  
   if (profileId) {
-    console.log('[Init] Rendering card view for:', profileId);
     await renderCardView(profileId);
     return;
   }

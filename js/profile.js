@@ -123,29 +123,19 @@ async function shareProfile(profileId, name) {
 
 // ==================== Card View ====================
 async function renderCardView(profileId) {
-  console.log('[CardView] Loading profile:', profileId);
-  
   // 먼저 state에서 찾고, 없으면 DB에서 직접 조회
   let profile = state.profiles.find(p => p.id === profileId) || (state.userProfile?.id === profileId ? state.userProfile : null);
   
   if (!profile) {
     // DB에서 직접 조회
-    console.log('[CardView] Not in state, fetching from DB...');
     const { data, error } = await supabase.from('profiles').select('*').eq('id', profileId).single();
-    console.log('[CardView] DB result:', { data, error });
-    if (error) {
-      console.error('[CardView] DB error:', error);
-    }
     profile = data;
   }
   
   if (!profile) {
-    console.log('[CardView] Profile not found');
     $('#app').innerHTML = `<div class="min-h-screen flex items-center justify-center bg-zinc-100"><div class="text-center"><p class="text-4xl mb-2">🔍</p><p class="text-zinc-500 text-sm">Not found</p></div></div>`;
     return;
   }
-  
-  console.log('[CardView] Rendering profile:', profile.name);
   
   const t = themes[profile.bg_theme] || themes.snow;
   const f = fontOptions[profile.font] || fontOptions.inter;
@@ -194,8 +184,8 @@ async function renderCardView(profileId) {
   
   $('#app').innerHTML = `
     <div id="card-view" class="fixed inset-0 overflow-y-auto" style="background: ${t.bg}; font-family: ${f.family} !important;">
-      <!-- Header -->
-      <div class="fixed top-0 left-0 right-0 z-50 px-5 sm:px-4 py-3 flex items-center justify-between" style="background: linear-gradient(to bottom, ${t.bg} 60%, transparent);">
+      <!-- Header (모바일 전용) -->
+      <div class="sm:hidden fixed top-0 left-0 right-0 z-50 px-5 py-3 flex items-center justify-between" style="background: linear-gradient(to bottom, ${t.bg} 60%, transparent);">
         <a href="/" class="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
           <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background: linear-gradient(145deg, #18181b 0%, #27272a 50%, #18181b 100%); box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
             <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
@@ -216,50 +206,80 @@ async function renderCardView(profileId) {
       </div>
       
       <!-- 모바일: 전체화면 / PC,태블릿: 카드 -->
-      <div class="min-h-full flex flex-col pt-14 pb-6 sm:py-16 sm:items-center sm:justify-center">
-        <div class="flex-1 sm:flex-none w-full sm:max-w-sm sm:px-4">
-          <div class="h-full px-7 pt-6 pb-8 sm:rounded-[32px] sm:p-8 sm:h-auto" 
+      <div class="min-h-full flex flex-col pt-14 pb-6 sm:pt-0 sm:pb-0 sm:py-12 sm:items-center sm:justify-center">
+        <div class="flex-1 sm:flex-none w-full max-w-md mx-auto sm:max-w-[480px] sm:px-4">
+          <div class="h-full px-7 pt-6 pb-8 sm:rounded-[32px] sm:pt-5 sm:px-10 sm:pb-10 sm:h-auto" 
                style="background: ${t.bg}; font-family: ${f.family} !important;">
+          
+          <!-- Header (PC 전용 - 카드 안) -->
+          <div class="hidden sm:flex items-center justify-between mb-6">
+            <a href="/" class="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
+              <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background: linear-gradient(145deg, #18181b 0%, #27272a 50%, #18181b 100%); box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
+                  <rect x="7" y="8" width="4" height="20" rx="2" fill="white"/>
+                  <rect x="25" y="8" width="4" height="20" rx="2" fill="white"/>
+                  <rect x="11" y="15" width="14" height="4" rx="2" fill="white"/>
+                  <circle cx="29" cy="10" r="2" fill="#a78bfa" opacity="0.9"/>
+                </svg>
+              </div>
+            </a>
+            <button onclick="shareProfile('${profile.id}', '${profile.name || ''}')" 
+              class="w-9 h-9 rounded-xl flex items-center justify-center opacity-70 hover:opacity-100 transition-all hover:scale-105"
+              style="background: ${t.btn}; border: 1px solid ${t.border}; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <svg class="w-4 h-4" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+              </svg>
+            </button>
+          </div>
           
           <!-- Avatar -->
           <div class="flex justify-center mb-5 sm:mb-6">
             <div class="relative">
               <div class="absolute inset-0 rounded-full blur-xl opacity-30 hidden sm:block" style="background: ${t.accent};"></div>
-              <div class="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden transition-all duration-500 hover:scale-105" 
+              <div class="relative w-[120px] h-[120px] sm:w-36 sm:h-36 rounded-full overflow-hidden transition-all duration-500 hover:scale-105" 
                    style="background: ${t.btn}; box-shadow: 0 0 0 3px ${t.bg}, 0 0 0 5px ${t.border}, 0 20px 40px -10px rgba(0,0,0,0.15);">
                 ${profile.avatar_url 
                   ? `<img src="${profile.avatar_url}" class="w-full h-full object-cover"/>` 
-                  : `<span class="w-full h-full flex items-center justify-center text-3xl sm:text-5xl" style="color: ${t.textSub}">👤</span>`}
+                  : `<span class="w-full h-full flex items-center justify-center text-4xl sm:text-5xl" style="color: ${t.textSub}">👤</span>`}
               </div>
             </div>
           </div>
           
           <!-- Name & Info -->
           <div class="text-center mb-6 sm:mb-8">
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight mb-1" style="color: ${t.text}; letter-spacing: -0.02em; font-family: ${f.family} !important;">${profile.name||'Name'}</h1>
-            <p class="text-sm font-medium mb-0.5" style="color: ${t.textSub}; font-family: ${f.family} !important;">${profile.company || ''}</p>
-            <p class="text-xs" style="color: ${t.textSub}; opacity: 0.7; font-family: ${f.family} !important;">${profile.title || ''}</p>
+            <h1 class="text-[24px] sm:text-[28px] font-bold tracking-tight mb-1" style="color: ${t.text}; letter-spacing: -0.02em; font-family: ${f.family} !important;">${profile.name||'Name'}</h1>
+            <p class="text-[18px] font-medium mb-0.5" style="color: ${t.textSub}; font-family: ${f.family} !important;">${profile.company || ''}</p>
+            <p class="text-[16px]" style="color: ${t.textSub}; opacity: 0.7; font-family: ${f.family} !important;">${profile.title || ''}</p>
           </div>
           
-          ${socialHtml ? `<div class="${socialCount >= 6 ? 'flex justify-between w-full' : 'flex justify-center gap-2.5 sm:gap-3'} mb-6 sm:mb-8">${socialHtml}</div>` : ''}
+          ${socialHtml ? `<div class="${socialCount >= 6 ? 'flex justify-between w-full' : 'flex justify-center gap-2.5 sm:gap-3.5'} mb-6 sm:mb-8">${socialHtml}</div>` : ''}
           
-          <div class="space-y-2.5">${linksHtml}</div>
+          <div class="space-y-2.5 sm:space-y-3">${linksHtml}</div>
           
           <!-- URL 표시 (모바일) -->
-          <p class="mt-6 sm:hidden text-center text-[10px] font-semibold tracking-wide uppercase" style="color: ${t.textSub}; opacity: 0.4;">
+          <p class="mt-6 sm:hidden text-center text-[12px] font-semibold tracking-wide uppercase" style="color: ${t.textSub}; opacity: 0.4;">
             hashed.live/${profile.id}
           </p>
         </div>
         </div>
         
         <!-- URL 표시 (PC/태블릿) -->
-        <p class="hidden sm:block mt-6 text-center text-[11px] font-semibold tracking-wide uppercase" style="color: ${t.textSub}; opacity: 0.5;">
+        <p class="hidden sm:block mt-6 text-center text-[13px] font-semibold tracking-wide uppercase" style="color: ${t.textSub}; opacity: 0.5;">
           hashed.live/${profile.id}
         </p>
       </div>
     </div>
     
     <style>
+      html, body, #app {
+        background: ${t.bg} !important;
+        min-height: 100%;
+        min-height: 100dvh;
+      }
+      #card-view {
+        min-height: 100%;
+        min-height: 100dvh;
+      }
       @media (min-width: 640px) {
         .sm\\:rounded-\\[32px\\] {
           background: ${t.card} !important;
@@ -270,6 +290,9 @@ async function renderCardView(profileId) {
     </style>
   `;
   
-  // body 배경색도 테마에 맞춤
+  // html, body, app 배경색 모두 테마에 맞춤
+  document.documentElement.style.background = t.bg;
   document.body.style.background = t.bg;
+  const app = document.getElementById('app');
+  if (app) app.style.background = t.bg;
 }
