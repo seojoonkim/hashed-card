@@ -161,34 +161,34 @@ function renderDashboardPanel() {
         <p class="text-[9px] text-zinc-400 mt-2">Share this code with people who want to join. They'll need admin approval after requesting.</p>
       </div>
       
-      <div class="grid grid-cols-2 gap-4">
-        <!-- Join Requests -->
+      <div class="space-y-4">
+        <!-- Join Requests (Full Width) -->
         <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
           <h2 class="text-xs font-semibold text-zinc-700 mb-3">Join Requests</h2>
           <div class="space-y-2 max-h-60 overflow-y-auto">
             ${pendingRequests.length > 0 ? pendingRequests.map(req => `
-              <div class="flex items-center justify-between p-2 rounded-lg bg-amber-50 border border-amber-100">
+              <div class="flex items-center justify-between p-3 rounded-lg bg-amber-50 border border-amber-100">
                 <div class="flex-1 min-w-0">
-                  <p class="text-[11px] font-medium text-zinc-800 truncate">${req.name}</p>
-                  <p class="text-[9px] text-zinc-500 truncate">${req.email}</p>
+                  <p class="text-sm font-medium text-zinc-800">${req.name}</p>
+                  <p class="text-xs text-zinc-500">${req.email}</p>
                 </div>
-                <div class="flex gap-1 flex-shrink-0 ml-2">
-                  <button onclick="handleApproveRequest('${req.id}')" class="px-2 py-1 rounded text-white text-[9px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);">Approve</button>
-                  <button onclick="handleRejectRequest('${req.id}')" class="px-2 py-1 rounded text-zinc-600 text-[9px] transition-all duration-200 hover:-translate-y-0.5" style="background: linear-gradient(180deg, #f4f4f5 0%, #e4e4e7 100%);">Reject</button>
+                <div class="flex gap-2 flex-shrink-0 ml-4">
+                  <button onclick="handleApproveRequest('${req.id}')" class="px-3 py-1.5 rounded-lg text-white text-[11px] font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md" style="background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);">Approve</button>
+                  <button onclick="handleRejectRequest('${req.id}')" class="px-3 py-1.5 rounded-lg text-zinc-600 text-[11px] font-medium transition-all duration-200 hover:-translate-y-0.5" style="background: linear-gradient(180deg, #f4f4f5 0%, #e4e4e7 100%);">Reject</button>
                 </div>
               </div>
             `).join('') : `
-              <p class="text-[10px] text-zinc-400 text-center py-4">No pending requests</p>
+              <p class="text-[11px] text-zinc-400 text-center py-6">No pending requests</p>
             `}
           </div>
           
           ${(state.joinRequests || []).filter(r => r.status !== 'pending').length > 0 ? `
             <div class="mt-3 pt-3 border-t border-zinc-100">
-              <p class="text-[9px] text-zinc-400 mb-2">History</p>
+              <p class="text-[10px] text-zinc-400 mb-2">History</p>
               <div class="space-y-1 max-h-24 overflow-y-auto">
                 ${(state.joinRequests || []).filter(r => r.status !== 'pending').slice(0, 5).map(req => `
-                  <div class="flex items-center justify-between py-1 text-[9px]">
-                    <span class="text-zinc-500 truncate">${req.email}</span>
+                  <div class="flex items-center justify-between py-1 text-[10px]">
+                    <span class="text-zinc-500">${req.name} (${req.email})</span>
                     <span class="${req.status === 'approved' ? 'text-green-500' : 'text-red-400'}">${req.status}</span>
                   </div>
                 `).join('')}
@@ -197,17 +197,17 @@ function renderDashboardPanel() {
           ` : ''}
         </div>
         
-        <!-- Recent Members -->
+        <!-- Recent Members (Full Width) -->
         <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
           <h2 class="text-xs font-semibold text-zinc-700 mb-3">Recent Members</h2>
           <div class="space-y-2">
             ${[...state.profiles].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,6).map(p => `
-              <div class="flex items-center gap-2 py-1">
-                <div class="w-6 h-6 rounded-full bg-zinc-100 overflow-hidden flex-shrink-0">
-                  ${p.avatar_url ? `<img src="${p.avatar_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-[9px] text-zinc-400">${p.name?.[0]||'?'}</span>`}
+              <div class="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-zinc-50 transition-colors">
+                <div class="w-8 h-8 rounded-full bg-zinc-100 overflow-hidden flex-shrink-0">
+                  ${p.avatar_url ? `<img src="${p.avatar_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-xs text-zinc-400">${p.name?.[0]||'?'}</span>`}
                 </div>
-                <span class="text-[11px] text-zinc-600 truncate flex-1">${p.name||p.id}</span>
-                <button onclick="selectProfile('${p.id}')" class="text-[10px] text-zinc-400 hover:text-zinc-600">Edit</button>
+                <span class="text-sm text-zinc-700 flex-1">${p.name||p.id}</span>
+                <button onclick="selectProfile('${p.id}')" class="text-[11px] text-zinc-400 hover:text-zinc-600 px-2 py-1 rounded hover:bg-zinc-100">Edit</button>
               </div>
             `).join('')}
           </div>
@@ -530,9 +530,35 @@ function renderEmptyPreview() {
 }
 
 // ==================== Handlers ====================
-function showDashboard() { state.selectedView = 'dashboard'; state.selectedProfileId = null; state.editingProfile = null; renderDashboard(); }
+function showDashboard() { 
+  if (state.editingProfile && hasUnsavedChanges()) {
+    if (!confirm('You have unsaved changes. Leave without saving?')) {
+      return;
+    }
+  }
+  state.selectedView = 'dashboard'; 
+  state.selectedProfileId = null; 
+  state.editingProfile = null; 
+  renderDashboard(); 
+}
+
+function hasUnsavedChanges() {
+  if (!state.editingProfile || !state.selectedProfileId) return false;
+  const original = state.profiles.find(x => x.id === state.selectedProfileId) || state.userProfile;
+  if (!original) return false;
+  return JSON.stringify(state.editingProfile) !== JSON.stringify(original);
+}
 
 function selectProfile(id) {
+  // 현재 편집 중인 프로필이 있고 변경사항이 있으면 경고
+  if (state.editingProfile && state.selectedProfileId && state.selectedProfileId !== id) {
+    if (hasUnsavedChanges()) {
+      if (!confirm('You have unsaved changes. Leave without saving?')) {
+        return;
+      }
+    }
+  }
+  
   state.selectedView = 'profile';
   state.selectedProfileId = id;
   const p = state.profiles.find(x => x.id === id) || state.userProfile;

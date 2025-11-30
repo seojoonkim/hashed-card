@@ -54,12 +54,13 @@ async function submitJoinRequest(name, email, password, code) {
   const valid = await validateInviteCode(code);
   if (!valid) throw new Error('Invalid invite code');
   
-  // Check existing
-  const { data: existingReq } = await supabase.from('join_requests').select('id').eq('email', email).single();
-  if (existingReq) throw new Error('Request already submitted for this email');
-  
+  // Check if already registered
   const { data: existingUser } = await supabase.from('profiles').select('id').eq('email', email).single();
   if (existingUser) throw new Error('Email already registered');
+  
+  // Check if pending request exists
+  const { data: existingReq } = await supabase.from('join_requests').select('id').eq('email', email).single();
+  if (existingReq) throw new Error('Request already submitted. Please wait for admin approval.');
   
   const { data, error } = await supabase.from('join_requests').insert({ 
     name, 
@@ -98,13 +99,13 @@ async function approveJoinRequest(requestId) {
     socialOrder: []
   });
   
-  // Update request
-  await supabase.from('join_requests').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', requestId);
+  // Delete the request after approval (no longer needed)
+  await supabase.from('join_requests').delete().eq('id', requestId);
   return req;
 }
 
 async function rejectJoinRequest(requestId) {
-  await supabase.from('join_requests').update({ status: 'rejected' }).eq('id', requestId);
+  await supabase.from('join_requests').delete().eq('id', requestId);
 }
 
 async function deleteJoinRequest(requestId) {
