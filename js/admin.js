@@ -407,12 +407,12 @@ function renderMobileEditorPanel(profile) {
           </div>
           
           ${enabledSocials.length < 6 ? `
-          <div class="flex flex-wrap gap-1.5">
+          <div class="grid grid-cols-4 gap-1.5">
             ${availableSocials.slice(0, 12).map(key => {
               const opt = socialOptions[key];
               return `
-                <button onclick="addSocial('${key}')" class="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-zinc-50 border border-zinc-100 text-xs text-zinc-500">
-                  <span class="w-3 h-3">${opt.icon}</span>${opt.name}
+                <button onclick="addSocial('${key}')" class="flex items-center justify-center gap-1 px-1.5 py-1.5 rounded-lg bg-zinc-50 border border-zinc-100 text-xs text-zinc-500">
+                  <span class="w-3 h-3 flex-shrink-0">${opt.icon}</span><span class="truncate">${opt.name}</span>
                 </button>
               `;
             }).join('')}
@@ -430,6 +430,7 @@ function renderMobileEditorPanel(profile) {
             ${(profile.links || []).map((link, idx) => `
               <div class="p-3 rounded-lg bg-zinc-50 border border-zinc-100">
                 <div class="flex gap-2 mb-2">
+                  <button onclick="showIconPicker(${idx})" class="text-lg w-10 h-10 flex items-center justify-center bg-white rounded-lg border border-zinc-200">${link.icon||'🔗'}</button>
                   <input type="text" value="${link.title||''}" placeholder="Title" 
                     oninput="updateLink(${idx}, 'title', this.value)"
                     class="flex-1 px-2 py-1.5 rounded-md bg-white border border-zinc-200 text-sm focus:outline-none">
@@ -449,28 +450,51 @@ function renderMobileEditorPanel(profile) {
           
           <div class="mb-3">
             <label class="text-xs text-zinc-400 block mb-2">Color Theme</label>
-            <div class="grid grid-cols-8 gap-1.5">
-              ${Object.entries(themes).slice(0, 24).map(([key, t]) => `
+            <div class="grid grid-cols-10 gap-1">
+              ${Object.entries(themes).map(([key, t]) => `
                 <button onclick="updateTheme('${key}')" 
                   class="w-full aspect-square rounded-lg border-2 ${profile.theme === key ? 'border-zinc-900 ring-1 ring-zinc-900' : 'border-zinc-200'}" 
                   style="background: ${t.bg};" title="${t.name}"></button>
               `).join('')}
             </div>
-            <button onclick="showThemePicker()" class="mt-2 text-xs text-zinc-400 hover:text-zinc-600">Show all themes →</button>
           </div>
           
           <div>
             <label class="text-xs text-zinc-400 block mb-2">Font</label>
             <div class="grid grid-cols-3 gap-1.5">
-              ${Object.entries(fontOptions).slice(0, 6).map(([key, f]) => `
+              ${Object.entries(fontOptions).map(([key, f]) => `
                 <button onclick="updateFont('${key}')" 
                   class="px-2 py-2 rounded-lg text-xs ${profile.font === key ? 'bg-zinc-900 text-white' : 'bg-zinc-50 text-zinc-600 border border-zinc-200'}"
                   style="font-family: ${f.family};">${f.name}</button>
               `).join('')}
             </div>
-            <button onclick="showFontPicker()" class="mt-2 text-xs text-zinc-400 hover:text-zinc-600">Show all fonts →</button>
           </div>
         </div>
+        
+        <!-- Account (Password Change) -->
+        ${profile.id === state.userProfile?.id ? `
+        <div class="bg-white rounded-xl border border-zinc-200 p-4">
+          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide block mb-3">Account</label>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Email</label>
+              <input type="email" value="${profile.email || ''}" disabled
+                class="w-full px-3 py-2 rounded-lg bg-zinc-100 border border-zinc-200 text-sm text-zinc-500 cursor-not-allowed">
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">New Password</label>
+              <input type="password" id="new-password" placeholder="Enter new password" minlength="6"
+                class="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm focus:outline-none">
+            </div>
+            <div>
+              <label class="text-xs text-zinc-400 block mb-1">Confirm Password</label>
+              <input type="password" id="confirm-password" placeholder="Confirm new password" minlength="6"
+                class="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm focus:outline-none">
+            </div>
+            <button onclick="handleChangePassword()" class="w-full py-2 rounded-lg bg-zinc-100 text-zinc-600 text-sm font-medium hover:bg-zinc-200 transition-colors">Change Password</button>
+          </div>
+        </div>
+        ` : ''}
         
         </div>
       </div>
@@ -801,12 +825,12 @@ function renderEditorPanel(profile) {
         </div>
         
         ${enabledSocials.length < 6 ? `
-        <div class="flex flex-wrap gap-1">
+        <div class="grid grid-cols-5 gap-1">
           ${availableSocials.map(key => {
             const opt = socialOptions[key];
             return `
-              <button onclick="addSocial('${key}')" class="flex items-center gap-1 px-2 py-1 rounded-md bg-zinc-50 border border-zinc-100 text-[9px] text-zinc-500 hover:border-zinc-200 hover:text-zinc-600 transition-colors">
-                <span class="w-2.5 h-2.5">${opt.icon}</span>${opt.name}
+              <button onclick="addSocial('${key}')" class="flex items-center justify-center gap-1 px-1.5 py-1.5 rounded-md bg-zinc-50 border border-zinc-100 text-[9px] text-zinc-500 hover:border-zinc-200 hover:text-zinc-600 transition-colors">
+                <span class="w-2.5 h-2.5 flex-shrink-0">${opt.icon}</span><span class="truncate">${opt.name}</span>
               </button>
             `;
           }).join('')}
@@ -1056,7 +1080,28 @@ function selectProfile(id) {
   renderDashboard();
 }
 
-function handleSearch(q) { state.searchQuery = q; renderDashboard(); }
+let searchTimeout = null;
+function handleSearch(q) { 
+  state.searchQuery = q;
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    const activeEl = document.activeElement;
+    const cursorPos = activeEl?.selectionStart;
+    renderDashboard();
+    // Focus 복원
+    requestAnimationFrame(() => {
+      const searchInputs = document.querySelectorAll('input[placeholder="Search"], input[placeholder="Search members..."]');
+      searchInputs.forEach(input => {
+        if (input.value === q) {
+          input.focus();
+          if (cursorPos !== undefined) {
+            input.setSelectionRange(cursorPos, cursorPos);
+          }
+        }
+      });
+    });
+  }, 150);
+}
 function selectTheme(t) { if (state.editingProfile) { state.editingProfile.bg_theme = t; updatePreview(); updateFontThemeButtons(); } }
 function selectFont(f) { 
   if (state.editingProfile) { 
