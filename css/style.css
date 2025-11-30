@@ -1,0 +1,53 @@
+* { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #d4d4d8; }
+input:focus, select:focus, textarea:focus, button:focus { outline: none; }
+input::placeholder { color: #c4c4c4; }
+
+/* Button base styles */
+button { 
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+button:active { 
+  transform: scale(0.97);
+}
+
+/* Primary buttons (dark) */
+.btn-primary {
+  background: linear-gradient(180deg, #27272a 0%, #18181b 100%);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.btn-primary:hover {
+  background: linear-gradient(180deg, #3f3f46 0%, #27272a 100%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Secondary buttons (light) */
+.btn-secondary {
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8);
+  border: 1px solid #e4e4e7;
+}
+.btn-secondary:hover {
+  background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+  border-color: #d4d4d8;
+}
+
+/* Clickable items */
+.clickable {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.clickable:hover {
+  transform: translateY(-1px);
+}
+.clickable:active {
+  transform: translateY(0);
+}
+
+.animate-slide-in { animation: slideIn 0.2s ease; }
+@keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
