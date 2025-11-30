@@ -124,14 +124,18 @@ function renderLogin() {
     <div class="min-h-screen bg-zinc-50 flex items-center justify-center p-4">
       <div class="w-full max-w-sm">
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-3" style="background: linear-gradient(135deg, #18181b 0%, #3f3f46 100%); box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-            <svg class="w-8 h-8 text-white" viewBox="0 0 32 32" fill="none">
-              <path d="M8 8h4v16H8V8zm12 0h4v16h-4V8zM14 14h4v4h-4v-4z" fill="currentColor"/>
-              <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2" fill="none" opacity="0.3"/>
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4" style="background: linear-gradient(145deg, #18181b 0%, #27272a 50%, #18181b 100%); box-shadow: 0 8px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);">
+            <svg class="w-9 h-9" viewBox="0 0 36 36" fill="none">
+              <!-- H shape with modern rounded style -->
+              <rect x="7" y="8" width="4" height="20" rx="2" fill="white"/>
+              <rect x="25" y="8" width="4" height="20" rx="2" fill="white"/>
+              <rect x="11" y="15" width="14" height="4" rx="2" fill="white"/>
+              <!-- Subtle accent dot -->
+              <circle cx="29" cy="10" r="2" fill="#a78bfa" opacity="0.9"/>
             </svg>
           </div>
           <h1 class="text-xl font-bold text-zinc-900 tracking-tight">Hashed.Live</h1>
-          <p class="text-zinc-500 text-sm mt-1">Your mobile profile card</p>
+          <p class="text-zinc-400 text-sm mt-1">Your mobile profile card</p>
         </div>
         
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-zinc-200">

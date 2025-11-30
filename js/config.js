@@ -1,8 +1,13 @@
 // ==================== Supabase Config ====================
 const SUPABASE_URL = 'https://udxjalqfssewkhfgmkfa.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkeGphbHFmc3Nld2toZmdta2ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ1MTExODksImV4cCI6MjA4MDA4NzE4OX0.2aNuQOX2wju-erQQvLpNW6RPskEG9VRivaIdcgz_igY';
+const MASTER_ADMIN_EMAIL = 'simon@hashed.com';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function isMasterAdmin() {
+  return state.currentUser?.email === MASTER_ADMIN_EMAIL;
+}
 
 // ==================== State ====================
 const state = {

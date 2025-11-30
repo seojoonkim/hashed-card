@@ -37,12 +37,15 @@ function renderDashboard() {
       <div class="w-44 bg-zinc-50/80 border-r border-zinc-200/60 flex flex-col flex-shrink-0">
         <div class="p-3 border-b border-zinc-200/60">
           <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #18181b 0%, #3f3f46 100%); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-              <svg class="w-4 h-4 text-white" viewBox="0 0 32 32" fill="none">
-                <path d="M8 8h4v16H8V8zm12 0h4v16h-4V8zM14 14h4v4h-4v-4z" fill="currentColor"/>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background: linear-gradient(145deg, #18181b 0%, #27272a 50%, #18181b 100%); box-shadow: 0 2px 6px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1);">
+              <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
+                <rect x="7" y="8" width="4" height="20" rx="2" fill="white"/>
+                <rect x="25" y="8" width="4" height="20" rx="2" fill="white"/>
+                <rect x="11" y="15" width="14" height="4" rx="2" fill="white"/>
+                <circle cx="29" cy="10" r="2" fill="#a78bfa" opacity="0.9"/>
               </svg>
             </div>
-            <span class="font-bold text-zinc-800 text-xs tracking-tight">Hashed.Live</span>
+            <span class="font-bold text-zinc-800 text-sm tracking-tight">Hashed.Live</span>
           </div>
         </div>
         
@@ -411,7 +414,22 @@ function renderEditorPanel(profile) {
       </div>
       ` : ''}
       
-      ${isAdmin && !isOwn ? `
+      <!-- Master Admin: Role Management -->
+      ${isMasterAdmin() && !isOwn ? `
+      <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
+        <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide block mb-3">Role Management</label>
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] text-zinc-600">Current role: <span class="font-medium ${profile.role === 'admin' ? 'text-violet-600' : 'text-zinc-500'}">${profile.role || 'member'}</span></span>
+          <button onclick="toggleUserRole('${profile.id}', '${profile.role}')" 
+            class="px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            style="background: ${profile.role === 'admin' ? 'linear-gradient(180deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #fcd34d; color: #92400e;' : 'linear-gradient(180deg, #ede9fe 0%, #ddd6fe 100%); border: 1px solid #c4b5fd; color: #5b21b6;'}">
+            ${profile.role === 'admin' ? 'Demote to Member' : 'Promote to Admin'}
+          </button>
+        </div>
+      </div>
+      ` : ''}
+      
+      ${isAdmin && !isOwn && profile.email !== MASTER_ADMIN_EMAIL ? `
       <div class="pt-3">
         <button onclick="confirmDeleteProfile('${profile.id}')" class="text-[10px] text-red-400 hover:text-red-500 transition-colors">Delete member</button>
       </div>
@@ -741,10 +759,24 @@ async function handleCreateInvite(e) {
   } catch (err) { showToast(err.message, 'error'); }
 }
 
-function confirmDeleteProfile(id) { if (confirm('Delete this member?')) deleteProfileAndRefresh(id); }
+function confirmDeleteProfile(id) {
+  // 마스터 어드민은 삭제 불가
+  const profile = state.profiles.find(p => p.id === id);
+  if (profile?.email === MASTER_ADMIN_EMAIL) {
+    showToast('Cannot delete master admin', 'error');
+    return;
+  }
+  if (confirm('Delete this member?')) deleteProfileAndRefresh(id);
+}
 
 async function deleteProfileAndRefresh(id) {
   try {
+    // 한번 더 체크
+    const profile = state.profiles.find(p => p.id === id);
+    if (profile?.email === MASTER_ADMIN_EMAIL) {
+      showToast('Cannot delete master admin', 'error');
+      return;
+    }
     await deleteProfile(id);
     state.profiles = state.profiles.filter(p => p.id !== id);
     state.selectedProfileId = null;
@@ -819,5 +851,33 @@ async function handleChangePassword() {
     $('#confirm-password').value = '';
   } catch (e) { 
     showToast(e.message, 'error'); 
+  }
+}
+
+// ==================== Role Management (Master Admin Only) ====================
+async function toggleUserRole(profileId, currentRole) {
+  if (!isMasterAdmin()) {
+    showToast('Only master admin can change roles', 'error');
+    return;
+  }
+  
+  const newRole = currentRole === 'admin' ? 'member' : 'admin';
+  const action = newRole === 'admin' ? 'promote to Admin' : 'demote to Member';
+  
+  if (!confirm(`Are you sure you want to ${action}?`)) return;
+  
+  try {
+    const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', profileId);
+    if (error) throw error;
+    
+    // Update local state
+    const profile = state.profiles.find(p => p.id === profileId);
+    if (profile) profile.role = newRole;
+    if (state.editingProfile?.id === profileId) state.editingProfile.role = newRole;
+    
+    showToast(`User ${newRole === 'admin' ? 'promoted to Admin' : 'demoted to Member'}`);
+    renderDashboard();
+  } catch (e) {
+    showToast(e.message, 'error');
   }
 }

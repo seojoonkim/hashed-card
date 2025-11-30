@@ -3,8 +3,11 @@ async function handleRoute() {
   const hash = window.location.hash.slice(1) || '';
   const [route, param] = hash.split('/');
   
-  if (!state.currentUser) { renderLogin(); return; }
+  // 카드 뷰는 로그인 없이 접근 가능
   if (route === 'card' && param) { renderCardView(param); return; }
+  
+  // 그 외는 로그인 필요
+  if (!state.currentUser) { renderLogin(); return; }
   renderDashboard();
 }
 
