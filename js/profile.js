@@ -168,7 +168,7 @@ async function renderCardView(profileId) {
          onmouseover="this.style.boxShadow='0 12px 28px rgba(0,0,0,0.12)'; this.style.transform='translateY(-2px)'"
          onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'; this.style.transform='none'">
         <span class="text-xl mr-3 transition-transform duration-300 group-hover:scale-110">${l.icon||'🔗'}</span>
-        <span class="text-[15px] flex-1" style="color: ${t.text}; font-family: ${f.family} !important; font-weight: 450;">${l.title||'Untitled'}</span>
+        <span class="text-[17px] flex-1" style="color: ${t.text}; font-family: ${f.family} !important; font-weight: 450;">${l.title||'Untitled'}</span>
         <svg class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 opacity-30 group-hover:opacity-60" style="color: ${t.textSub}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
       </a>
     `;
@@ -186,20 +186,19 @@ async function renderCardView(profileId) {
     <div id="card-view" class="fixed inset-0 overflow-y-auto" style="background: ${t.bg}; font-family: ${f.family} !important;">
       <!-- Header (모바일 전용) -->
       <div class="sm:hidden fixed top-0 left-0 right-0 z-50 px-5 py-3 flex items-center justify-between" style="background: linear-gradient(to bottom, ${t.bg} 60%, transparent);">
-        <a href="/" class="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
-          <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background: linear-gradient(145deg, #18181b 0%, #27272a 50%, #18181b 100%); box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-            <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
-              <rect x="7" y="8" width="4" height="20" rx="2" fill="white"/>
-              <rect x="25" y="8" width="4" height="20" rx="2" fill="white"/>
-              <rect x="11" y="15" width="14" height="4" rx="2" fill="white"/>
-              <circle cx="29" cy="10" r="2" fill="#a78bfa" opacity="0.9"/>
+        <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <svg class="w-5 h-5" viewBox="0 0 36 36" fill="none">
+              <rect x="9" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
+              <rect x="23.5" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
+              <rect x="12.5" y="16" width="11" height="3.5" rx="1.5" fill="${t.text}"/>
             </svg>
           </div>
         </a>
         <button onclick="shareProfile('${profile.id}', '${profile.name || ''}')" 
-          class="w-9 h-9 rounded-xl flex items-center justify-center opacity-70 hover:opacity-100 transition-all hover:scale-105"
-          style="background: ${t.card}; border: 1px solid ${t.border}; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-          <svg class="w-4 h-4" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          class="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-all hover:scale-105"
+          style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+          <svg class="w-5 h-5" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
           </svg>
         </button>
@@ -208,25 +207,24 @@ async function renderCardView(profileId) {
       <!-- 모바일: 전체화면 / PC,태블릿: 카드 -->
       <div class="min-h-full flex flex-col pt-14 pb-6 sm:pt-0 sm:pb-0 sm:py-12 sm:items-center sm:justify-center">
         <div class="flex-1 sm:flex-none w-full max-w-md mx-auto sm:max-w-[480px] sm:px-4">
-          <div class="h-full px-7 pt-6 pb-8 sm:rounded-[32px] sm:pt-5 sm:px-10 sm:pb-10 sm:h-auto" 
-               style="background: ${t.bg}; font-family: ${f.family} !important;">
+          <div class="mobile-card h-full px-7 pt-6 pb-8 sm:rounded-[32px] sm:pt-5 sm:px-10 sm:pb-10 sm:h-auto" 
+               style="font-family: ${f.family} !important;">
           
           <!-- Header (PC 전용 - 카드 안) -->
           <div class="hidden sm:flex items-center justify-between mb-6">
-            <a href="/" class="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
-              <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background: linear-gradient(145deg, #18181b 0%, #27272a 50%, #18181b 100%); box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
-                  <rect x="7" y="8" width="4" height="20" rx="2" fill="white"/>
-                  <rect x="25" y="8" width="4" height="20" rx="2" fill="white"/>
-                  <rect x="11" y="15" width="14" height="4" rx="2" fill="white"/>
-                  <circle cx="29" cy="10" r="2" fill="#a78bfa" opacity="0.9"/>
+            <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <svg class="w-5 h-5" viewBox="0 0 36 36" fill="none">
+                  <rect x="9" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
+                  <rect x="23.5" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
+                  <rect x="12.5" y="16" width="11" height="3.5" rx="1.5" fill="${t.text}"/>
                 </svg>
               </div>
             </a>
             <button onclick="shareProfile('${profile.id}', '${profile.name || ''}')" 
-              class="w-9 h-9 rounded-xl flex items-center justify-center opacity-70 hover:opacity-100 transition-all hover:scale-105"
-              style="background: ${t.btn}; border: 1px solid ${t.border}; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-              <svg class="w-4 h-4" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              class="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-all hover:scale-105"
+              style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+              <svg class="w-5 h-5" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
               </svg>
             </button>
@@ -280,6 +278,13 @@ async function renderCardView(profileId) {
         min-height: 100%;
         min-height: 100dvh;
       }
+      /* 모바일: 카드 스타일 없음, 배경 통일 */
+      @media (max-width: 639px) {
+        .mobile-card {
+          background: transparent !important;
+        }
+      }
+      /* PC/태블릿: 카드 스타일 적용 */
       @media (min-width: 640px) {
         .sm\\:rounded-\\[32px\\] {
           background: ${t.card} !important;

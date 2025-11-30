@@ -490,8 +490,27 @@ function renderPreviewPanel(profile) {
       </div>
       <div id="preview-content" class="flex-1 overflow-y-auto flex items-center justify-center p-8" style="background: ${t.bg}; font-family: ${f.family} !important;">
         <div class="w-full max-w-[340px]">
-          <div class="rounded-[32px] p-8 backdrop-blur-xl transition-all duration-500" 
+          <div class="rounded-[32px] p-7 backdrop-blur-xl transition-all duration-500" 
                style="background: ${t.card}; border: 1px solid ${t.border}; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 0 0 1px ${t.border}; font-family: ${f.family} !important;">
+            
+            <!-- Header (로고 + 공유) -->
+            <div class="flex items-center justify-between mb-5">
+              <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                  <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
+                    <rect x="9" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
+                    <rect x="23.5" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
+                    <rect x="12.5" y="16" width="11" height="3.5" rx="1.5" fill="${t.text}"/>
+                  </svg>
+                </div>
+              </a>
+              <button class="w-9 h-9 rounded-full flex items-center justify-center hover:opacity-80 transition-all"
+                style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <svg class="w-4 h-4" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                </svg>
+              </button>
+            </div>
             
             <!-- Avatar with glow effect -->
             <div class="flex justify-center mb-6">
