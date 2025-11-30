@@ -185,23 +185,23 @@ async function renderCardView(profileId) {
   $('#app').innerHTML = `
     <div id="card-view" class="fixed inset-0 overflow-y-auto" style="background: ${t.bg}; font-family: ${f.family} !important;">
       <!-- Header (모바일 전용) -->
-      <div class="sm:hidden fixed top-0 left-0 right-0 z-50 px-5 py-3 flex items-center justify-between" style="background: linear-gradient(to bottom, ${t.bg} 60%, transparent);">
-        <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-            <svg class="w-5 h-5" viewBox="0 0 36 36" fill="none">
-              <rect x="9" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
-              <rect x="23.5" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
-              <rect x="12.5" y="16" width="11" height="3.5" rx="1.5" fill="${t.text}"/>
+      <div class="sm:hidden fixed top-0 left-0 right-0 z-50 py-3" style="background: linear-gradient(to bottom, ${t.bg} 60%, transparent);">
+        <div class="max-w-md mx-auto px-7 flex items-center justify-between">
+          <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+              <svg class="w-5 h-5" viewBox="0 0 36 36" fill="none">
+                <path d="M13 7L11 29M25 7L23 29M7 14H29M7 22H29" stroke="${t.text}" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </a>
+          <button onclick="shareProfile('${profile.id}', '${profile.name || ''}')" 
+            class="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-all hover:scale-105"
+            style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <svg class="w-5 h-5" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
             </svg>
-          </div>
-        </a>
-        <button onclick="shareProfile('${profile.id}', '${profile.name || ''}')" 
-          class="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-all hover:scale-105"
-          style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-          <svg class="w-5 h-5" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-          </svg>
-        </button>
+          </button>
+        </div>
       </div>
       
       <!-- 모바일: 전체화면 / PC,태블릿: 카드 -->
@@ -215,9 +215,7 @@ async function renderCardView(profileId) {
             <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                 <svg class="w-5 h-5" viewBox="0 0 36 36" fill="none">
-                  <rect x="9" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
-                  <rect x="23.5" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
-                  <rect x="12.5" y="16" width="11" height="3.5" rx="1.5" fill="${t.text}"/>
+                  <path d="M13 7L11 29M25 7L23 29M7 14H29M7 22H29" stroke="${t.text}" stroke-width="3" stroke-linecap="round"/>
                 </svg>
               </div>
             </a>
@@ -234,7 +232,7 @@ async function renderCardView(profileId) {
           <div class="flex justify-center mb-5 sm:mb-6">
             <div class="relative">
               <div class="absolute inset-0 rounded-full blur-xl opacity-30 hidden sm:block" style="background: ${t.accent};"></div>
-              <div class="relative w-[120px] h-[120px] sm:w-36 sm:h-36 rounded-full overflow-hidden transition-all duration-500 hover:scale-105" 
+              <div class="relative w-[144px] h-[144px] sm:w-36 sm:h-36 rounded-full overflow-hidden transition-all duration-500 hover:scale-105" 
                    style="background: ${t.btn}; box-shadow: 0 0 0 3px ${t.bg}, 0 0 0 5px ${t.border}, 0 20px 40px -10px rgba(0,0,0,0.15);">
                 ${profile.avatar_url 
                   ? `<img src="${profile.avatar_url}" class="w-full h-full object-cover"/>` 
@@ -252,7 +250,7 @@ async function renderCardView(profileId) {
           
           ${socialHtml ? `<div class="${socialCount >= 6 ? 'flex justify-between w-full' : 'flex justify-center gap-2.5 sm:gap-3.5'} mb-6 sm:mb-8">${socialHtml}</div>` : ''}
           
-          <div class="space-y-2.5 sm:space-y-3">${linksHtml}</div>
+          <div class="space-y-3 sm:space-y-3.5">${linksHtml}</div>
           
           <!-- URL 표시 (모바일) -->
           <p class="mt-6 sm:hidden text-center text-[12px] font-semibold tracking-wide uppercase" style="color: ${t.textSub}; opacity: 0.4;">

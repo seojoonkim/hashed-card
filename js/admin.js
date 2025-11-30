@@ -39,10 +39,7 @@ function renderDashboard() {
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background: linear-gradient(145deg, #18181b 0%, #27272a 50%, #18181b 100%); box-shadow: 0 2px 6px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1);">
               <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
-                <rect x="7" y="8" width="4" height="20" rx="2" fill="white"/>
-                <rect x="25" y="8" width="4" height="20" rx="2" fill="white"/>
-                <rect x="11" y="15" width="14" height="4" rx="2" fill="white"/>
-                <circle cx="29" cy="10" r="2" fill="#a78bfa" opacity="0.9"/>
+                <path d="M13 7L11 29M25 7L23 29M7 14H29M7 22H29" stroke="white" stroke-width="3" stroke-linecap="round"/>
               </svg>
             </div>
             <span class="font-bold text-zinc-800 text-sm tracking-tight">Hashed.Live</span>
@@ -498,9 +495,7 @@ function renderPreviewPanel(profile) {
               <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                   <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
-                    <rect x="9" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
-                    <rect x="23.5" y="10" width="3.5" height="16" rx="1.5" fill="${t.text}"/>
-                    <rect x="12.5" y="16" width="11" height="3.5" rx="1.5" fill="${t.text}"/>
+                    <path d="M13 7L11 29M25 7L23 29M7 14H29M7 22H29" stroke="${t.text}" stroke-width="3" stroke-linecap="round"/>
                   </svg>
                 </div>
               </a>

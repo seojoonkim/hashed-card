@@ -126,12 +126,7 @@ function renderLogin() {
         <div class="text-center mb-8">
           <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4" style="background: linear-gradient(145deg, #18181b 0%, #27272a 50%, #18181b 100%); box-shadow: 0 8px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);">
             <svg class="w-9 h-9" viewBox="0 0 36 36" fill="none">
-              <!-- H shape with modern rounded style -->
-              <rect x="7" y="8" width="4" height="20" rx="2" fill="white"/>
-              <rect x="25" y="8" width="4" height="20" rx="2" fill="white"/>
-              <rect x="11" y="15" width="14" height="4" rx="2" fill="white"/>
-              <!-- Subtle accent dot -->
-              <circle cx="29" cy="10" r="2" fill="#a78bfa" opacity="0.9"/>
+              <path d="M13 7L11 29M25 7L23 29M7 14H29M7 22H29" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
             </svg>
           </div>
           <h1 class="text-xl font-bold text-zinc-900 tracking-tight">Hashed.Live</h1>
