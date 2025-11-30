@@ -49,6 +49,7 @@ async function initApp() {
         state.selectedView = 'dashboard';
         state.selectedProfileId = null;
         state.editingProfile = null;
+        state.mobileTab = 'list';
       } else if (state.userProfile) {
         state.selectedProfileId = state.userProfile.id;
         state.editingProfile = JSON.parse(JSON.stringify(state.userProfile));
@@ -56,6 +57,7 @@ async function initApp() {
           state.editingProfile.socialOrder = Object.keys(state.editingProfile.socials || {}).filter(k => state.editingProfile.socials[k]?.enabled);
         }
         state.selectedView = 'profile';
+        state.mobileTab = 'edit';
       }
     }
     handleRoute();

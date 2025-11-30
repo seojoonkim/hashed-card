@@ -17,6 +17,17 @@ html, body {
 input:focus, select:focus, textarea:focus, button:focus { outline: none; }
 input::placeholder { color: #c4c4c4; }
 
+/* Safe Area for iOS */
+.safe-area-top { padding-top: env(safe-area-inset-top, 0); }
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
+
+/* Mobile card background fix */
+@media (max-width: 639px) {
+  .mobile-card {
+    background: transparent !important;
+  }
+}
+
 /* Button base styles */
 button { 
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

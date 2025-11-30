@@ -26,7 +26,8 @@ const state = {
   toasts: [],
   editingProfile: null,
   dragType: null, // 'social' | 'link'
-  dragIndex: null
+  dragIndex: null,
+  mobileTab: 'list' // 'list' | 'edit' | 'preview'
 };
 
 // ==================== Helpers ====================
