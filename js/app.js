@@ -16,7 +16,7 @@ async function handleRoute() {
   const profileId = getProfileIdFromPath();
   
   // 카드 뷰는 로그인 없이 접근 가능
-  if (profileId) { renderCardView(profileId); return; }
+  if (profileId) { await renderCardView(profileId); return; }
   
   // 그 외는 로그인 필요
   if (!state.currentUser) { renderLogin(); return; }
@@ -25,12 +25,26 @@ async function handleRoute() {
 
 // ==================== Init ====================
 async function initApp() {
+  console.log('[Init] Starting app...');
+  console.log('[Init] Path:', window.location.pathname);
+  console.log('[Init] Hash:', window.location.hash);
+  
   $('#app').innerHTML = `
     <div class="min-h-screen flex items-center justify-center bg-zinc-50">
       <div class="w-8 h-8 border-2 border-zinc-200 border-t-zinc-800 rounded-full animate-spin"></div>
     </div>
     <style>@keyframes spin{to{transform:rotate(360deg)}}.animate-spin{animation:spin .8s linear infinite}@keyframes slide-in{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}.animate-slide-in{animation:slide-in .2s ease}</style>
   `;
+  
+  // 프로필 경로가 있으면 먼저 카드 뷰 표시
+  const profileId = getProfileIdFromPath();
+  console.log('[Init] Profile ID from path:', profileId);
+  
+  if (profileId) {
+    console.log('[Init] Rendering card view for:', profileId);
+    await renderCardView(profileId);
+    return;
+  }
   
   try {
     state.currentUser = await getCurrentUser();
@@ -39,12 +53,10 @@ async function initApp() {
         state.profiles = await getAllProfiles();
         state.joinRequests = await getJoinRequests();
         state.globalInviteCode = await getGlobalInviteCode();
-        // Admin starts on dashboard, not profile
         state.selectedView = 'dashboard';
         state.selectedProfileId = null;
         state.editingProfile = null;
       } else if (state.userProfile) {
-        // Member starts on their own profile
         state.selectedProfileId = state.userProfile.id;
         state.editingProfile = JSON.parse(JSON.stringify(state.userProfile));
         if (!state.editingProfile.socialOrder) {
