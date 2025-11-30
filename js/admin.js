@@ -79,10 +79,10 @@ function renderDashboard() {
           
           ${filtered.filter(p => p.id !== my?.id).map(p => `
             <button onclick="selectProfile('${p.id}')" class="w-full flex items-center gap-2 px-3 py-1 ${state.selectedProfileId === p.id ? 'bg-white border-r-2 border-zinc-900' : 'hover:bg-white/60'}">
-              <div class="w-4 h-4 rounded-full bg-zinc-200 overflow-hidden flex-shrink-0">
-                ${p.avatar_url ? `<img src="${p.avatar_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-[8px] text-zinc-400">${p.name?.[0] || '?'}</span>`}
+              <div class="w-5 h-5 rounded-full bg-zinc-200 overflow-hidden flex-shrink-0">
+                ${p.avatar_url ? `<img src="${p.avatar_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-[9px] text-zinc-400">${p.name?.[0] || '?'}</span>`}
               </div>
-              <span class="truncate text-zinc-500 text-[10px]">${p.name || p.id}</span>
+              <span class="truncate text-zinc-600 text-[11px]">${p.name || p.id}</span>
             </button>
           `).join('')}
           

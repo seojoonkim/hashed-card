@@ -1,10 +1,22 @@
 // ==================== Router ====================
-async function handleRoute() {
+function getProfileIdFromPath() {
+  // 먼저 해시 확인: /#card/simon
   const hash = window.location.hash.slice(1) || '';
   const [route, param] = hash.split('/');
+  if (route === 'card' && param) return param;
+  
+  // 그 다음 경로 확인: /simon
+  const path = window.location.pathname.replace(/^\/+/, '').replace(/\/+$/, '');
+  if (path && path !== '' && !path.includes('.')) return path;
+  
+  return null;
+}
+
+async function handleRoute() {
+  const profileId = getProfileIdFromPath();
   
   // 카드 뷰는 로그인 없이 접근 가능
-  if (route === 'card' && param) { renderCardView(param); return; }
+  if (profileId) { renderCardView(profileId); return; }
   
   // 그 외는 로그인 필요
   if (!state.currentUser) { renderLogin(); return; }
