@@ -129,7 +129,7 @@ function renderDashboard() {
       </div>
       
       <!-- Mobile Content -->
-      <div class="flex-1 overflow-hidden">
+      <div id="mobile-content" class="flex-1 overflow-hidden">
         ${renderMobileContent(isAdmin, filtered, my, pending)}
       </div>
       
@@ -336,6 +336,7 @@ function renderMobileEditorPanel(profile) {
     profile.socialOrder = Object.keys(profile.socials || {}).filter(k => profile.socials[k]?.enabled);
   }
   if (!profile.font) profile.font = 'inter';
+  if (!profile.bg_theme) profile.bg_theme = 'snow';
   
   const enabledSocials = profile.socialOrder || [];
   const availableSocials = Object.keys(socialOptions).filter(k => !enabledSocials.includes(k));
@@ -355,6 +356,19 @@ function renderMobileEditorPanel(profile) {
       <div id="editor-column" class="flex-1 overflow-y-auto p-4">
         <div class="space-y-4">
         
+        <!-- Profile URL/ID -->
+        <div class="bg-white rounded-xl border border-zinc-200 p-4">
+          <label class="text-xs font-semibold text-zinc-800 uppercase tracking-wide block mb-2">Profile URL</label>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-zinc-800 font-medium">hashed.live/</span>
+            <input type="text" id="edit-id-mobile" value="${profile.id}" 
+              oninput="onMobileIdInput(this)"
+              class="flex-1 px-2 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-sm font-mono lowercase focus:outline-none focus:border-zinc-400">
+            <button id="save-id-btn-mobile" onclick="handleMobileChangeId()" class="hidden px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-medium">Save</button>
+          </div>
+          <p class="text-[10px] text-zinc-500 mt-1.5">Only lowercase letters, numbers, and hyphens</p>
+        </div>
+        
         <!-- Avatar & Basic Info -->
         <div class="bg-white rounded-xl border border-zinc-200 p-4">
           <div class="flex gap-4">
@@ -369,17 +383,17 @@ function renderMobileEditorPanel(profile) {
             
             <div class="flex-1 space-y-3">
               <div>
-                <label class="text-xs text-zinc-400 block mb-1">Name</label>
+                <label class="text-xs text-zinc-800 block mb-1">Name</label>
                 <input type="text" id="edit-name" value="${profile.name||''}" placeholder="John Doe" oninput="updatePreview()"
                   class="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm focus:outline-none">
               </div>
               <div>
-                <label class="text-xs text-zinc-400 block mb-1">Company</label>
+                <label class="text-xs text-zinc-800 block mb-1">Company</label>
                 <input type="text" id="edit-company" value="${profile.company||''}" placeholder="Company" oninput="updatePreview()"
                   class="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm focus:outline-none">
               </div>
               <div>
-                <label class="text-xs text-zinc-400 block mb-1">Title</label>
+                <label class="text-xs text-zinc-800 block mb-1">Title</label>
                 <input type="text" id="edit-title" value="${profile.title||''}" placeholder="CEO" oninput="updatePreview()"
                   class="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm focus:outline-none">
               </div>
@@ -389,7 +403,7 @@ function renderMobileEditorPanel(profile) {
         
         <!-- Social Links -->
         <div class="bg-white rounded-xl border border-zinc-200 p-4">
-          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide block mb-3">Social Links</label>
+          <label class="text-xs font-semibold text-zinc-800 uppercase tracking-wide block mb-3">Social Links</label>
           <div class="space-y-2 mb-3">
             ${enabledSocials.map((key, idx) => {
               const opt = socialOptions[key];
@@ -423,8 +437,8 @@ function renderMobileEditorPanel(profile) {
         <!-- Links -->
         <div class="bg-white rounded-xl border border-zinc-200 p-4">
           <div class="flex items-center justify-between mb-3">
-            <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Links</label>
-            <button onclick="addLink()" class="text-xs text-zinc-400 hover:text-zinc-600">+ Add</button>
+            <label class="text-xs font-semibold text-zinc-800 uppercase tracking-wide">Links</label>
+            <button onclick="addLink()" class="text-xs text-zinc-500 hover:text-zinc-700">+ Add</button>
           </div>
           <div class="space-y-2">
             ${(profile.links || []).map((link, idx) => `
@@ -446,24 +460,24 @@ function renderMobileEditorPanel(profile) {
         
         <!-- Theme & Font -->
         <div class="bg-white rounded-xl border border-zinc-200 p-4">
-          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide block mb-3">Theme & Font</label>
+          <label class="text-xs font-semibold text-zinc-800 uppercase tracking-wide block mb-3">Theme & Font</label>
           
           <div class="mb-3">
-            <label class="text-xs text-zinc-400 block mb-2">Color Theme</label>
+            <label class="text-xs text-zinc-800 block mb-2">Color Theme</label>
             <div class="grid grid-cols-10 gap-1">
               ${Object.entries(themes).map(([key, t]) => `
-                <button onclick="updateTheme('${key}')" 
-                  class="w-full aspect-square rounded-lg border-2 ${profile.theme === key ? 'border-zinc-900 ring-1 ring-zinc-900' : 'border-zinc-200'}" 
+                <button onclick="selectTheme('${key}')" 
+                  class="w-full aspect-square rounded-lg border-2 ${profile.bg_theme === key ? 'border-zinc-900 ring-1 ring-zinc-900' : 'border-zinc-200'}" 
                   style="background: ${t.bg};" title="${t.name}"></button>
               `).join('')}
             </div>
           </div>
           
           <div>
-            <label class="text-xs text-zinc-400 block mb-2">Font</label>
+            <label class="text-xs text-zinc-800 block mb-2">Font</label>
             <div class="grid grid-cols-3 gap-1.5">
               ${Object.entries(fontOptions).map(([key, f]) => `
-                <button onclick="updateFont('${key}')" 
+                <button onclick="selectFont('${key}')" 
                   class="px-2 py-2 rounded-lg text-xs ${profile.font === key ? 'bg-zinc-900 text-white' : 'bg-zinc-50 text-zinc-600 border border-zinc-200'}"
                   style="font-family: ${f.family};">${f.name}</button>
               `).join('')}
@@ -474,20 +488,20 @@ function renderMobileEditorPanel(profile) {
         <!-- Account (Password Change) -->
         ${profile.id === state.userProfile?.id ? `
         <div class="bg-white rounded-xl border border-zinc-200 p-4">
-          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wide block mb-3">Account</label>
+          <label class="text-xs font-semibold text-zinc-800 uppercase tracking-wide block mb-3">Account</label>
           <div class="space-y-3">
             <div>
-              <label class="text-xs text-zinc-400 block mb-1">Email</label>
+              <label class="text-xs text-zinc-800 block mb-1">Email</label>
               <input type="email" value="${profile.email || ''}" disabled
                 class="w-full px-3 py-2 rounded-lg bg-zinc-100 border border-zinc-200 text-sm text-zinc-500 cursor-not-allowed">
             </div>
             <div>
-              <label class="text-xs text-zinc-400 block mb-1">New Password</label>
+              <label class="text-xs text-zinc-800 block mb-1">New Password</label>
               <input type="password" id="new-password" placeholder="Enter new password" minlength="6"
                 class="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm focus:outline-none">
             </div>
             <div>
-              <label class="text-xs text-zinc-400 block mb-1">Confirm Password</label>
+              <label class="text-xs text-zinc-800 block mb-1">Confirm Password</label>
               <input type="password" id="confirm-password" placeholder="Confirm new password" minlength="6"
                 class="w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm focus:outline-none">
             </div>
@@ -506,7 +520,7 @@ function renderMobileEditorPanel(profile) {
 function renderMobilePreviewPanel(profile) {
   if (!profile) return renderMobileSelectPrompt();
   
-  const t = themes[profile.theme] || themes.snow;
+  const t = themes[profile.bg_theme] || themes.snow;
   const f = fontOptions[profile.font] || fontOptions.inter;
   loadFont(profile.font || 'inter');
   
@@ -1102,7 +1116,20 @@ function handleSearch(q) {
     });
   }, 150);
 }
-function selectTheme(t) { if (state.editingProfile) { state.editingProfile.bg_theme = t; updatePreview(); updateFontThemeButtons(); } }
+function selectTheme(t) { 
+  if (state.editingProfile) { 
+    state.editingProfile.bg_theme = t; 
+    updatePreview(); 
+    updateFontThemeButtons();
+    // 모바일에서는 에디터 전체 리렌더링
+    if (window.innerWidth < 768) {
+      const mobileContent = document.getElementById('mobile-content');
+      if (mobileContent && state.mobileTab === 'edit') {
+        mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
+      }
+    }
+  } 
+}
 function selectFont(f) { 
   if (state.editingProfile) { 
     state.editingProfile.font = f;
@@ -1118,12 +1145,33 @@ function selectFont(f) {
         // 폰트 로드 대기 후 업데이트
         setTimeout(() => {
           updatePreview();
+          // 모바일에서는 에디터 전체 리렌더링
+          if (window.innerWidth < 768) {
+            const mobileContent = document.getElementById('mobile-content');
+            if (mobileContent && state.mobileTab === 'edit') {
+              mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
+            }
+          }
         }, 100);
       } else {
         updatePreview();
+        // 모바일에서는 에디터 전체 리렌더링
+        if (window.innerWidth < 768) {
+          const mobileContent = document.getElementById('mobile-content');
+          if (mobileContent && state.mobileTab === 'edit') {
+            mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
+          }
+        }
       }
     } else {
       updatePreview();
+      // 모바일에서는 에디터 전체 리렌더링
+      if (window.innerWidth < 768) {
+        const mobileContent = document.getElementById('mobile-content');
+        if (mobileContent && state.mobileTab === 'edit') {
+          mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
+        }
+      }
     }
     updateFontThemeButtons();
   } 
@@ -1208,6 +1256,36 @@ async function handleChangeId() {
   const newId = $('#edit-id').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
   if (!newId) return showToast('Invalid ID', 'error');
   if (newId === state.editingProfile.id) return toggleEditId();
+  try {
+    await updateProfileId(state.editingProfile.id, newId);
+    const idx = state.profiles.findIndex(p => p.id === state.selectedProfileId);
+    if (idx >= 0) state.profiles[idx].id = newId;
+    if (state.userProfile?.id === state.selectedProfileId) state.userProfile.id = newId;
+    state.editingProfile.id = newId;
+    state.selectedProfileId = newId;
+    showToast('URL updated!');
+    renderDashboard();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+// Mobile ID change functions
+function onMobileIdInput(input) {
+  const newId = input.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  input.value = newId;
+  const saveBtn = document.getElementById('save-id-btn-mobile');
+  if (saveBtn) {
+    saveBtn.classList.toggle('hidden', newId === state.editingProfile?.id);
+  }
+}
+
+async function handleMobileChangeId() {
+  const newId = $('#edit-id-mobile')?.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  if (!newId) return showToast('Invalid ID', 'error');
+  if (newId === state.editingProfile.id) {
+    const saveBtn = document.getElementById('save-id-btn-mobile');
+    if (saveBtn) saveBtn.classList.add('hidden');
+    return;
+  }
   try {
     await updateProfileId(state.editingProfile.id, newId);
     const idx = state.profiles.findIndex(p => p.id === state.selectedProfileId);
@@ -1417,8 +1495,8 @@ function showThemePicker() {
         <div class="p-4 overflow-y-auto max-h-[60vh]">
           <div class="grid grid-cols-6 sm:grid-cols-8 gap-2">
             ${Object.entries(themes).map(([key, t]) => `
-              <button onclick="updateTheme('${key}'); closeModal();" 
-                class="aspect-square rounded-lg border-2 ${state.editingProfile?.theme === key ? 'border-zinc-900 ring-2 ring-zinc-900/20' : 'border-zinc-200 hover:border-zinc-300'}" 
+              <button onclick="selectTheme('${key}'); closeModal();" 
+                class="aspect-square rounded-lg border-2 ${state.editingProfile?.bg_theme === key ? 'border-zinc-900 ring-2 ring-zinc-900/20' : 'border-zinc-200 hover:border-zinc-300'}" 
                 style="background: ${t.bg};" title="${t.name}"></button>
             `).join('')}
           </div>
@@ -1443,7 +1521,7 @@ function showFontPicker() {
             ${Object.entries(fontOptions).map(([key, f]) => {
               loadFont(key);
               return `
-                <button onclick="updateFont('${key}'); closeModal();" 
+                <button onclick="selectFont('${key}'); closeModal();" 
                   class="px-4 py-3 rounded-xl text-sm ${state.editingProfile?.font === key ? 'bg-zinc-900 text-white' : 'bg-zinc-50 text-zinc-600 border border-zinc-200 hover:border-zinc-300'}"
                   style="font-family: ${f.family};">${f.name}</button>
               `;
