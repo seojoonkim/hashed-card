@@ -377,7 +377,7 @@ function renderMobileEditorPanel(profile) {
             <span class="text-sm text-zinc-800 font-medium">hashed.live/</span>
             <input type="text" id="edit-id-mobile" value="${profile.id}" 
               oninput="onMobileIdInput(this)"
-              class="flex-1 px-2 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-sm font-mono lowercase focus:outline-none focus:border-zinc-400">
+              class="flex-1 px-2 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-sm font-mono text-zinc-800 lowercase focus:outline-none focus:border-zinc-400">
             <button id="save-id-btn-mobile" onclick="handleMobileChangeId()" class="hidden px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-medium">Save</button>
           </div>
           <p class="text-[10px] text-zinc-500 mt-1.5">Only lowercase letters, numbers, and hyphens</p>
@@ -760,7 +760,7 @@ function renderEditorPanel(profile) {
         </div>
         <div class="flex items-center gap-2">
           <span class="text-[11px] text-zinc-800 font-medium">hashed.live/</span>
-          <input type="text" id="edit-id" value="${profile.id}" disabled class="flex-1 px-2 py-1.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[11px] font-mono disabled:text-zinc-400 focus:outline-none focus:border-zinc-300">
+          <input type="text" id="edit-id" value="${profile.id}" disabled class="flex-1 px-2 py-1.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[11px] font-mono text-zinc-800 disabled:text-zinc-800 focus:outline-none focus:border-zinc-300">
           <button onclick="handleChangeId()" id="save-id-btn" class="hidden px-3 py-1.5 rounded-md bg-zinc-900 text-white text-[10px]">Update</button>
         </div>
       </div>
@@ -954,15 +954,15 @@ function renderPreviewPanel(profile) {
   // Load font
   loadFont(profile.font);
   
+  // 실제 카드 뷰와 동일한 크기/비율 사용
   const socialCount = socialOrder.filter(key => profile.socials?.[key]?.url).length;
   const socialHtml = socialOrder.slice(0, 6).map(key => {
     const s = profile.socials?.[key];
     if (!s?.url) return '';
     const opt = socialOptions[key];
     const url = buildSocialUrl(key, s.url);
-    // 6개일 때 크기 줄임
-    const size = socialCount >= 6 ? '40px' : '44px';
-    const iconSize = socialCount >= 6 ? '16px' : '20px';
+    const size = socialCount >= 6 ? '46px' : '48px';
+    const iconSize = socialCount >= 6 ? '18px' : '22px';
     return `
       <a href="${url}" target="_blank" 
          class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
@@ -975,12 +975,12 @@ function renderPreviewPanel(profile) {
     const url = normalizeUrl(l.url);
     return `
       <a href="${url}" target="_blank" 
-         class="group flex items-center w-full px-5 py-4 rounded-[24px] transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5"
+         class="group flex items-center w-full px-6 py-4 rounded-[24px] transition-all duration-300 hover:-translate-y-0.5"
          style="background: ${t.btn}; border: 1px solid ${t.border}; box-shadow: 0 2px 8px rgba(0,0,0,0.04); font-family: ${f.family} !important;"
-         onmouseover="this.style.boxShadow='0 12px 28px rgba(0,0,0,0.12)'; this.style.transform='translateY(-2px) scale(1.01)'"
+         onmouseover="this.style.boxShadow='0 12px 28px rgba(0,0,0,0.12)'; this.style.transform='translateY(-2px)'"
          onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'; this.style.transform='none'">
         <span class="text-xl mr-3 transition-transform duration-300 group-hover:scale-110">${l.icon||'🔗'}</span>
-        <span class="text-sm flex-1" style="color: ${t.text}; font-family: ${f.family} !important; font-weight: 450;">${l.title||'Untitled'}</span>
+        <span class="text-[17px] flex-1" style="color: ${t.text}; font-family: ${f.family} !important; font-weight: 450;">${l.title||'Untitled'}</span>
         <svg class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 opacity-30 group-hover:opacity-60" style="color: ${t.textSub}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
       </a>
     `;
@@ -992,63 +992,66 @@ function renderPreviewPanel(profile) {
         <span class="text-[9px] text-zinc-400 font-medium uppercase tracking-wider">Preview</span>
         <a href="#card/${profile.id}" target="_blank" class="text-[9px] text-zinc-500 hover:text-zinc-700 transition-colors">Open ↗</a>
       </div>
-      <div id="preview-content" class="flex-1 overflow-y-auto flex items-center justify-center p-8" style="background: ${t.bg}; font-family: ${f.family} !important;">
-        <div class="w-full max-w-[340px]">
-          <div class="rounded-[32px] p-7 backdrop-blur-xl transition-all duration-500" 
-               style="background: ${t.card}; border: 1px solid ${t.border}; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 0 0 1px ${t.border}; font-family: ${f.family} !important;">
-            
-            <!-- Header (로고 + 공유) -->
-            <div class="flex items-center justify-between mb-5">
-              <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                  <svg class="w-4 h-4" viewBox="0 0 36 36" fill="none">
-                    <path d="M13 7L11 29M25 7L23 29M7 14H29M7 22H29" stroke="${t.text}" stroke-width="3" stroke-linecap="round"/>
+      <div id="preview-content" class="flex-1 overflow-hidden flex items-start justify-center pt-6" style="background: ${t.bg};">
+        <!-- 실제 카드와 동일한 크기(480px)를 scale로 축소 -->
+        <div style="transform: scale(0.68); transform-origin: top center;">
+          <div class="w-[480px]">
+            <div class="rounded-[32px] px-10 pt-5 pb-10 backdrop-blur-xl" 
+                 style="background: ${t.card}; border: 1px solid ${t.border}; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 0 0 1px ${t.border}; font-family: ${f.family} !important;">
+              
+              <!-- Header -->
+              <div class="flex items-center justify-between mb-6">
+                <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <svg class="w-5 h-5" viewBox="0 0 36 36" fill="none">
+                      <path d="M13 7L11 29M25 7L23 29M7 14H29M7 22H29" stroke="${t.text}" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                </a>
+                <button class="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-all hover:scale-105"
+                  style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                  <svg class="w-5 h-5" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                   </svg>
-                </div>
-              </a>
-              <button class="w-9 h-9 rounded-full flex items-center justify-center hover:opacity-80 transition-all"
-                style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                <svg class="w-4 h-4" style="color: ${t.text}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-                </svg>
-              </button>
-            </div>
-            
-            <!-- Avatar with glow effect -->
-            <div class="flex justify-center mb-6">
-              <div class="relative">
-                <div class="absolute inset-0 rounded-full blur-xl opacity-30" style="background: ${t.accent};"></div>
-                <div class="relative w-28 h-28 rounded-full overflow-hidden transition-all duration-500 hover:scale-105" 
-                     style="background: ${t.btn}; box-shadow: 0 0 0 3px ${t.card}, 0 0 0 5px ${t.border}, 0 20px 40px -10px rgba(0,0,0,0.2);">
-                  ${profile.avatar_url 
-                    ? `<img src="${profile.avatar_url}" class="w-full h-full object-cover"/>` 
-                    : `<span class="w-full h-full flex items-center justify-center text-4xl" style="color: ${t.textSub}">👤</span>`}
+                </button>
+              </div>
+              
+              <!-- Avatar -->
+              <div class="flex justify-center mb-6">
+                <div class="relative">
+                  <div class="absolute inset-0 rounded-full blur-xl opacity-30" style="background: ${t.accent};"></div>
+                  <div class="relative w-36 h-36 rounded-full overflow-hidden transition-all duration-500 hover:scale-105" 
+                       style="background: ${t.btn}; box-shadow: 0 0 0 3px ${t.bg}, 0 0 0 5px ${t.border}, 0 20px 40px -10px rgba(0,0,0,0.15);">
+                    ${profile.avatar_url 
+                      ? `<img src="${profile.avatar_url}" class="w-full h-full object-cover"/>` 
+                      : `<span class="w-full h-full flex items-center justify-center text-5xl" style="color: ${t.textSub}">👤</span>`}
+                  </div>
                 </div>
               </div>
+              
+              <!-- Name & Info -->
+              <div class="text-center mb-8">
+                <h1 class="text-[28px] font-bold tracking-tight mb-1" style="color: ${t.text}; letter-spacing: -0.02em; font-family: ${f.family} !important;">${profile.name||'Name'}</h1>
+                <p class="text-[18px] font-medium mb-0.5" style="color: ${t.textSub}; font-family: ${f.family} !important;">${profile.company || ''}</p>
+                <p class="text-[16px]" style="color: ${t.textSub}; opacity: 0.7; font-family: ${f.family} !important;">${profile.title || ''}</p>
+              </div>
+              
+              <!-- Socials -->
+              ${socialHtml ? `
+              <div class="${socialCount >= 6 ? 'flex justify-between w-full' : 'flex justify-center gap-3.5'} mb-8">
+                ${socialHtml}
+              </div>
+              ` : ''}
+              
+              <!-- Links -->
+              <div class="space-y-3.5">${linksHtml || `<p class="text-center text-sm py-6" style="color: ${t.textSub}; opacity: 0.6">No links added yet</p>`}</div>
             </div>
             
-            <!-- Name & Info with refined typography -->
-            <div class="text-center mb-7">
-              <h1 class="text-2xl font-bold tracking-tight mb-1.5" style="color: ${t.text}; letter-spacing: -0.02em; font-family: ${f.family} !important;">${profile.name||'Name'}</h1>
-              <p class="text-sm font-medium mb-0.5" style="color: ${t.textSub}; font-family: ${f.family} !important;">${profile.company || ''}</p>
-              <p class="text-xs" style="color: ${t.textSub}; opacity: 0.7; font-family: ${f.family} !important;">${profile.title || ''}</p>
-            </div>
-            
-            <!-- Socials - 6개일 때 Links와 동일한 폭 -->
-            ${socialHtml ? `
-            <div class="${socialCount >= 6 ? 'flex justify-between w-full' : 'flex justify-center gap-3'} mb-7">
-              ${socialHtml}
-            </div>
-            ` : ''}
-            
-            <!-- Links with improved design -->
-            <div class="space-y-2.5">${linksHtml || `<p class="text-center text-xs py-4" style="color: ${t.textSub}; opacity: 0.6">No links added yet</p>`}</div>
+            <!-- URL -->
+            <p class="mt-6 text-center text-[13px] font-semibold tracking-wide uppercase" style="color: ${t.textSub}; opacity: 0.5;">
+              hashed.live/${profile.id}
+            </p>
           </div>
-          
-          <!-- URL 표시 -->
-          <p class="mt-8 text-center text-[11px] font-semibold tracking-wide uppercase" style="color: ${t.textSub}; opacity: 0.5;">
-            hashed.live/${profile.id}
-          </p>
         </div>
       </div>
     </div>
