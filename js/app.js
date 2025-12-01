@@ -13,12 +13,12 @@ function getProfileIdFromPath() {
 }
 
 async function handleRoute() {
-  // 로그인된 상태라면 항상 대시보드
-  if (state.currentUser) { renderDashboard(); return; }
-  
-  // 로그인 안 된 상태에서 카드 뷰 허용
+  // URL에 프로필 ID가 있으면 카드 뷰 (로그인 상태와 무관)
   const profileId = getProfileIdFromPath();
   if (profileId) { await renderCardView(profileId); return; }
+  
+  // 프로필 ID 없고 로그인된 상태면 대시보드
+  if (state.currentUser) { renderDashboard(); return; }
   
   // 그 외는 로그인 화면
   renderLogin();
@@ -34,10 +34,19 @@ async function initApp() {
   `;
   
   try {
-    // 먼저 로그인 상태 확인
+    // URL에 프로필 ID가 있으면 먼저 카드 뷰 (로그인 체크 전)
+    const profileId = getProfileIdFromPath();
+    if (profileId) {
+      await renderCardView(profileId);
+      // 백그라운드에서 로그인 상태 확인 (카드 뷰에서 대시보드로 갈 때 필요)
+      state.currentUser = await getCurrentUser();
+      return;
+    }
+    
+    // 프로필 ID 없으면 로그인 상태 확인
     state.currentUser = await getCurrentUser();
     
-    // 로그인된 상태라면 대시보드로 (URL의 profileId 무시)
+    // 로그인된 상태라면 대시보드
     if (state.currentUser) {
       if (state.userRole === 'admin') {
         state.profiles = await getAllProfiles();
@@ -57,13 +66,6 @@ async function initApp() {
         state.mobileTab = 'edit';
       }
       renderDashboard();
-      return;
-    }
-    
-    // 로그인 안 된 상태에서만 카드 뷰 허용
-    const profileId = getProfileIdFromPath();
-    if (profileId) {
-      await renderCardView(profileId);
       return;
     }
     
