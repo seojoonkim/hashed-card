@@ -142,6 +142,13 @@ async function renderCardView(profileId) {
   const socialOrder = profile.socialOrder || Object.keys(profile.socials || {}).filter(k => profile.socials[k]?.enabled);
   const links = profile.links || [];
   
+  // 그라데이션에서 첫 번째 색상 추출 (theme-color용)
+  const extractFirstColor = (bg) => {
+    const match = bg.match(/#[a-fA-F0-9]{6}|#[a-fA-F0-9]{3}|rgba?\([^)]+\)/);
+    return match ? match[0] : '#ffffff';
+  };
+  const themeColor = extractFirstColor(t.bg);
+  
   // 동적으로 theme-color 메타태그 업데이트 (iOS Safari 상태바 색상)
   let themeColorMeta = document.querySelector('meta[name="theme-color"]');
   if (!themeColorMeta) {
@@ -149,7 +156,7 @@ async function renderCardView(profileId) {
     themeColorMeta.name = 'theme-color';
     document.head.appendChild(themeColorMeta);
   }
-  themeColorMeta.content = t.bg;
+  themeColorMeta.content = themeColor;
   
   // iOS Safari 하단 바 색상도 설정
   let statusBarMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
@@ -159,7 +166,7 @@ async function renderCardView(profileId) {
     document.head.appendChild(statusBarMeta);
   }
   // 밝은 배경이면 dark-content, 어두운 배경이면 light-content
-  const isDark = isColorDark(t.bg);
+  const isDark = isColorDark(themeColor);
   statusBarMeta.content = isDark ? 'light-content' : 'dark-content';
   
   const socialCount = socialOrder.filter(key => profile.socials?.[key]?.url).length;
@@ -204,9 +211,9 @@ async function renderCardView(profileId) {
   
   $('#app').innerHTML = `
     <div id="card-view" class="fixed inset-0 overflow-y-auto" style="background: ${t.bg}; font-family: ${f.family} !important;">
-      <!-- Header (모바일 전용) -->
-      <div class="sm:hidden fixed top-0 left-0 right-0 z-50 safe-area-top" style="background: ${t.bg};">
-        <div class="max-w-md mx-auto px-7 py-3 flex items-center justify-between">
+      <!-- Header (모바일 전용) - 배경 투명 -->
+      <div class="sm:hidden fixed top-0 left-0 right-0 z-50 safe-area-top">
+        <div class="px-7 py-3 flex items-center justify-between">
           <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
               <svg class="w-5 h-5" viewBox="0 0 36 36" fill="none">
@@ -225,7 +232,7 @@ async function renderCardView(profileId) {
       </div>
       
       <!-- 모바일: 전체화면 / PC,태블릿: 카드 -->
-      <div class="min-h-full flex flex-col pt-20 sm:pt-0 sm:pb-0 sm:py-12 sm:items-center sm:justify-center safe-area-content">
+      <div class="min-h-full flex flex-col mobile-content-top sm:pt-0 sm:pb-0 sm:py-12 sm:items-center sm:justify-center safe-area-content">
         <div class="flex-1 sm:flex-none w-full max-w-md mx-auto sm:max-w-[480px] sm:px-4">
           <div class="mobile-card h-full px-7 pt-2 pb-8 sm:rounded-[32px] sm:pt-5 sm:px-10 sm:pb-10 sm:h-auto" 
                style="font-family: ${f.family} !important;">
@@ -306,6 +313,13 @@ async function renderCardView(profileId) {
       }
       .safe-area-bottom-text {
         padding-bottom: calc(env(safe-area-inset-bottom, 0) + 8px);
+      }
+      
+      /* 모바일 콘텐츠 상단 패딩 (safe-area + 헤더 높이) */
+      @media (max-width: 639px) {
+        .mobile-content-top {
+          padding-top: calc(env(safe-area-inset-top, 0) + 72px);
+        }
       }
       
       /* 모바일: 카드 스타일 없음, 배경 통일 */
