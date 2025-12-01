@@ -169,8 +169,8 @@ async function renderCardView(profileId) {
     const opt = socialOptions[key];
     const url = buildSocialUrl(key, s.url);
     // 6개일 때 크기 줄임
-    const size = socialCount >= 6 ? '46px' : '48px';
-    const iconSize = socialCount >= 6 ? '18px' : '22px';
+    const size = socialCount >= 6 ? '46px' : '50px';
+    const iconSize = socialCount >= 6 ? '18px' : '20px';
     return `
       <a href="${url}" target="_blank" 
          class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 

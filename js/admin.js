@@ -539,8 +539,9 @@ function renderMobilePreviewPanel(profile) {
   loadFont(profile.font || 'inter');
   
   const enabledSocials = profile.socialOrder || Object.keys(profile.socials || {}).filter(k => profile.socials[k]?.enabled);
-  const iconSize = enabledSocials.length <= 4 ? '26px' : '22px';
-  const containerClass = enabledSocials.length <= 4 ? 'gap-4' : 'gap-3';
+  const socialCount = enabledSocials.filter(key => profile.socials?.[key]?.url).length;
+  const btnSize = socialCount >= 6 ? '46px' : '50px';
+  const iconSize = socialCount >= 6 ? '18px' : '20px';
   
   return `
     <div class="h-full overflow-y-auto" style="background: ${t.bg};">
@@ -578,11 +579,11 @@ function renderMobilePreviewPanel(profile) {
         
         <!-- Social Icons -->
         ${enabledSocials.length > 0 ? `
-        <div class="flex justify-center ${containerClass} mb-6">
+        <div class="${socialCount >= 6 ? 'flex justify-between w-full' : 'flex justify-center gap-3'} mb-6">
           ${enabledSocials.map(key => {
             const opt = socialOptions[key];
             return `
-              <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: ${t.btn}; border: 1.5px solid ${t.border};">
+              <div class="rounded-full flex items-center justify-center" style="width: ${btnSize}; height: ${btnSize}; background: ${t.btn}; border: 1.5px solid ${t.border};">
                 <span style="width: ${iconSize}; height: ${iconSize}; color: ${t.text};">${opt.icon}</span>
               </div>
             `;
@@ -961,8 +962,8 @@ function renderPreviewPanel(profile) {
     if (!s?.url) return '';
     const opt = socialOptions[key];
     const url = buildSocialUrl(key, s.url);
-    const size = socialCount >= 6 ? '46px' : '48px';
-    const iconSize = socialCount >= 6 ? '18px' : '22px';
+    const size = socialCount >= 6 ? '46px' : '50px';
+    const iconSize = socialCount >= 6 ? '18px' : '20px';
     return `
       <a href="${url}" target="_blank" 
          class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
