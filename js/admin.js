@@ -21,9 +21,17 @@ async function updateProfileId(oldId, newId) {
 
 // ==================== Main Render ====================
 function renderDashboard() {
-  // 스크롤 위치 저장
+  // theme-color를 기본값으로 복원 (카드 뷰에서 변경됐을 수 있음)
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeColorMeta) themeColorMeta.content = '#fafafa';
+  document.documentElement.style.background = '';
+  document.body.style.background = '';
+  
+  // 스크롤 위치 저장 (editor-column은 PC와 모바일 에디터 둘 다 사용)
   const editorColumn = document.getElementById('editor-column');
-  const scrollTop = editorColumn ? editorColumn.scrollTop : 0;
+  if (editorColumn) {
+    state._editorScrollTop = editorColumn.scrollTop;
+  }
   
   const isAdmin = state.userRole === 'admin';
   const filtered = isAdmin ? getFilteredProfiles() : [];
@@ -165,12 +173,18 @@ function renderDashboard() {
   `;
   
   // 스크롤 위치 복원
-  requestAnimationFrame(() => {
-    const newEditorColumn = document.getElementById('editor-column');
-    if (newEditorColumn && scrollTop > 0) {
-      newEditorColumn.scrollTop = scrollTop;
-    }
-  });
+  if (state._editorScrollTop > 0) {
+    // 여러 번 시도해서 확실하게 복원
+    const restoreScroll = () => {
+      const newEditorColumn = document.getElementById('editor-column');
+      if (newEditorColumn) {
+        newEditorColumn.scrollTop = state._editorScrollTop;
+      }
+    };
+    requestAnimationFrame(restoreScroll);
+    setTimeout(restoreScroll, 10);
+    setTimeout(restoreScroll, 50);
+  }
 }
 
 // Mobile Tab Switch
@@ -741,11 +755,11 @@ function renderEditorPanel(profile) {
       <!-- URL -->
       <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
         <div class="flex items-center justify-between mb-2">
-          <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Profile URL</label>
-          <button onclick="toggleEditId()" id="edit-id-btn" class="text-[10px] text-zinc-400 hover:text-zinc-600">Change</button>
+          <label class="text-[10px] font-semibold text-zinc-800 uppercase tracking-wide">Profile URL</label>
+          <button onclick="toggleEditId()" id="edit-id-btn" class="text-[10px] text-zinc-500 hover:text-zinc-700">Change</button>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-[11px] text-zinc-400">hashed.live/</span>
+          <span class="text-[11px] text-zinc-800 font-medium">hashed.live/</span>
           <input type="text" id="edit-id" value="${profile.id}" disabled class="flex-1 px-2 py-1.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[11px] font-mono disabled:text-zinc-400 focus:outline-none focus:border-zinc-300">
           <button onclick="handleChangeId()" id="save-id-btn" class="hidden px-3 py-1.5 rounded-md bg-zinc-900 text-white text-[10px]">Update</button>
         </div>
@@ -753,7 +767,7 @@ function renderEditorPanel(profile) {
       
       <!-- Profile -->
       <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
-        <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide block mb-3">Profile</label>
+        <label class="text-[10px] font-semibold text-zinc-800 uppercase tracking-wide block mb-3">Profile</label>
         
         <div class="flex gap-4">
           <div class="flex flex-col items-center flex-shrink-0">
@@ -768,17 +782,17 @@ function renderEditorPanel(profile) {
           
           <div class="flex-1 space-y-2">
             <div>
-              <label class="text-[9px] text-zinc-400 block mb-0.5">Name</label>
+              <label class="text-[9px] text-zinc-800 block mb-0.5">Name</label>
               <input type="text" id="edit-name" value="${profile.name||''}" placeholder="John Doe" oninput="updatePreview()"
                 class="w-full px-2.5 py-1.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[11px] focus:outline-none focus:border-zinc-300">
             </div>
             <div>
-              <label class="text-[9px] text-zinc-400 block mb-0.5">Company</label>
+              <label class="text-[9px] text-zinc-800 block mb-0.5">Company</label>
               <input type="text" id="edit-company" value="${profile.company||''}" placeholder="Hashed" oninput="updatePreview()"
                 class="w-full px-2.5 py-1.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[11px] focus:outline-none focus:border-zinc-300">
             </div>
             <div>
-              <label class="text-[9px] text-zinc-400 block mb-0.5">Title</label>
+              <label class="text-[9px] text-zinc-800 block mb-0.5">Title</label>
               <input type="text" id="edit-title" value="${profile.title||''}" placeholder="CEO" oninput="updatePreview()"
                 class="w-full px-2.5 py-1.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[11px] focus:outline-none focus:border-zinc-300">
             </div>
@@ -788,7 +802,7 @@ function renderEditorPanel(profile) {
       
       <!-- Font -->
       <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
-        <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide block mb-2">Font</label>
+        <label class="text-[10px] font-semibold text-zinc-800 uppercase tracking-wide block mb-2">Font</label>
         <div class="grid grid-cols-3 gap-1.5">
           ${Object.entries(fontOptions).map(([k, f]) => `
             <button onclick="selectFont('${k}')" data-font="${k}" style="font-family: ${f.family}; ${profile.font === k ? 'background: linear-gradient(180deg, #27272a 0%, #18181b 100%); color: #fff; border-color: #3f3f46;' : 'background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%); color: #52525b; border-color: #e5e5e5;'}"
@@ -801,7 +815,7 @@ function renderEditorPanel(profile) {
       
       <!-- Theme -->
       <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
-        <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide block mb-2">Theme</label>
+        <label class="text-[10px] font-semibold text-zinc-800 uppercase tracking-wide block mb-2">Theme</label>
         <div class="grid grid-cols-10 gap-1">
           ${Object.entries(themes).map(([k, t]) => `
             <button onclick="selectTheme('${k}')" data-theme="${k}" title="${t.name}"
@@ -814,10 +828,10 @@ function renderEditorPanel(profile) {
       <!-- Social -->
       <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
         <div class="flex items-center justify-between mb-2">
-          <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Social Links</label>
-          <span class="text-[9px] text-zinc-300">${enabledSocials.length}/6</span>
+          <label class="text-[10px] font-semibold text-zinc-800 uppercase tracking-wide">Social Links</label>
+          <span class="text-[9px] text-zinc-400">${enabledSocials.length}/6</span>
         </div>
-        <p class="text-[9px] text-zinc-400 mb-2">Enter username or URL · Drag to reorder</p>
+        <p class="text-[9px] text-zinc-500 mb-2">Enter username or URL · Drag to reorder</p>
         
         <div id="social-list" class="space-y-1 mb-2">
           ${enabledSocials.map((key, idx) => {
@@ -855,10 +869,10 @@ function renderEditorPanel(profile) {
       <!-- Links -->
       <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
         <div class="flex items-center justify-between mb-2">
-          <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">Links</label>
-          <button onclick="addLink()" class="text-[10px] text-zinc-400 hover:text-zinc-600 transition-colors">+ Add</button>
+          <label class="text-[10px] font-semibold text-zinc-800 uppercase tracking-wide">Links</label>
+          <button onclick="addLink()" class="text-[10px] text-zinc-500 hover:text-zinc-700 transition-colors">+ Add</button>
         </div>
-        <p class="text-[9px] text-zinc-400 mb-2">Drag to reorder</p>
+        <p class="text-[9px] text-zinc-500 mb-2">Drag to reorder</p>
         
         <div id="links-container" class="space-y-1">
           ${(profile.links||[]).map((l, idx) => `
@@ -880,20 +894,20 @@ function renderEditorPanel(profile) {
       <!-- Account -->
       ${isOwn ? `
       <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
-        <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide block mb-3">Account</label>
+        <label class="text-[10px] font-semibold text-zinc-800 uppercase tracking-wide block mb-3">Account</label>
         <div class="space-y-2">
           <div>
-            <label class="text-[9px] text-zinc-400 block mb-0.5">Email</label>
+            <label class="text-[9px] text-zinc-800 block mb-0.5">Email</label>
             <input type="email" value="${profile.email || ''}" disabled
               class="w-full px-2.5 py-1.5 rounded-md bg-zinc-100 border border-zinc-200/60 text-[11px] text-zinc-500 cursor-not-allowed">
           </div>
           <div>
-            <label class="text-[9px] text-zinc-400 block mb-0.5">New Password</label>
+            <label class="text-[9px] text-zinc-800 block mb-0.5">New Password</label>
             <input type="password" id="new-password" placeholder="Enter new password" minlength="6"
               class="w-full px-2.5 py-1.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[11px] focus:outline-none focus:border-zinc-300">
           </div>
           <div>
-            <label class="text-[9px] text-zinc-400 block mb-0.5">Confirm Password</label>
+            <label class="text-[9px] text-zinc-800 block mb-0.5">Confirm Password</label>
             <input type="password" id="confirm-password" placeholder="Confirm new password" minlength="6"
               class="w-full px-2.5 py-1.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[11px] focus:outline-none focus:border-zinc-300">
           </div>
@@ -907,7 +921,7 @@ function renderEditorPanel(profile) {
       <!-- Master Admin: Role Management -->
       ${isMasterAdmin() && !isOwn ? `
       <div class="bg-white rounded-xl border border-zinc-200/60 p-4 shadow-sm">
-        <label class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide block mb-3">Role Management</label>
+        <label class="text-[10px] font-semibold text-zinc-800 uppercase tracking-wide block mb-3">Role Management</label>
         <div class="flex items-center justify-between">
           <span class="text-[11px] text-zinc-600">Current role: <span class="font-medium ${profile.role === 'admin' ? 'text-violet-600' : 'text-zinc-500'}">${profile.role || 'member'}</span></span>
           <button onclick="toggleUserRole('${profile.id}', '${profile.role}')" 
@@ -1121,13 +1135,7 @@ function selectTheme(t) {
     state.editingProfile.bg_theme = t; 
     updatePreview(); 
     updateFontThemeButtons();
-    // 모바일에서는 에디터 전체 리렌더링
-    if (window.innerWidth < 768) {
-      const mobileContent = document.getElementById('mobile-content');
-      if (mobileContent && state.mobileTab === 'edit') {
-        mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
-      }
-    }
+    updateMobileView();
   } 
 }
 function selectFont(f) { 
@@ -1145,36 +1153,44 @@ function selectFont(f) {
         // 폰트 로드 대기 후 업데이트
         setTimeout(() => {
           updatePreview();
-          // 모바일에서는 에디터 전체 리렌더링
-          if (window.innerWidth < 768) {
-            const mobileContent = document.getElementById('mobile-content');
-            if (mobileContent && state.mobileTab === 'edit') {
-              mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
-            }
-          }
+          updateMobileView();
         }, 100);
       } else {
         updatePreview();
-        // 모바일에서는 에디터 전체 리렌더링
-        if (window.innerWidth < 768) {
-          const mobileContent = document.getElementById('mobile-content');
-          if (mobileContent && state.mobileTab === 'edit') {
-            mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
-          }
-        }
+        updateMobileView();
       }
     } else {
       updatePreview();
-      // 모바일에서는 에디터 전체 리렌더링
-      if (window.innerWidth < 768) {
-        const mobileContent = document.getElementById('mobile-content');
-        if (mobileContent && state.mobileTab === 'edit') {
-          mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
-        }
-      }
+      updateMobileView();
     }
     updateFontThemeButtons();
   } 
+}
+
+// 모바일 뷰 업데이트 헬퍼
+function updateMobileView() {
+  if (window.innerWidth < 768) {
+    const mobileContent = document.getElementById('mobile-content');
+    if (mobileContent) {
+      // 스크롤 위치 저장
+      const editorColumn = document.getElementById('editor-column');
+      const scrollTop = editorColumn ? editorColumn.scrollTop : 0;
+      
+      if (state.mobileTab === 'edit') {
+        mobileContent.innerHTML = renderMobileEditorPanel(state.editingProfile);
+      } else if (state.mobileTab === 'preview') {
+        mobileContent.innerHTML = renderMobilePreviewPanel(state.editingProfile);
+      }
+      
+      // 스크롤 위치 복원
+      if (scrollTop > 0) {
+        requestAnimationFrame(() => {
+          const newEditorColumn = document.getElementById('editor-column');
+          if (newEditorColumn) newEditorColumn.scrollTop = scrollTop;
+        });
+      }
+    }
+  }
 }
 
 function updateFontThemeButtons() {
@@ -1270,8 +1286,22 @@ async function handleChangeId() {
 
 // Mobile ID change functions
 function onMobileIdInput(input) {
-  const newId = input.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-  input.value = newId;
+  const oldValue = input.value;
+  const newId = oldValue.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  
+  // 값이 변경된 경우에만 업데이트 (커서 위치 보존)
+  if (oldValue !== newId) {
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const diff = oldValue.length - newId.length;
+    
+    input.value = newId;
+    
+    // 커서 위치 복원 (제거된 문자 수만큼 조정)
+    const newPos = Math.max(0, start - diff);
+    input.setSelectionRange(newPos, newPos);
+  }
+  
   const saveBtn = document.getElementById('save-id-btn-mobile');
   if (saveBtn) {
     saveBtn.classList.toggle('hidden', newId === state.editingProfile?.id);

@@ -84,8 +84,19 @@ async function approveJoinRequest(requestId) {
   });
   if (authError) throw authError;
   
-  // Create profile
-  const profileId = req.name.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.random().toString(36).substring(2, 5);
+  // Create profile ID from email (@ 앞부분, 점 제거)
+  const emailPrefix = req.email.split('@')[0].toLowerCase().replace(/\./g, '').replace(/[^a-z0-9]/g, '');
+  let profileId = emailPrefix;
+  
+  // 중복 체크
+  let suffix = 1;
+  while (true) {
+    const { data: existing } = await supabase.from('profiles').select('id').eq('id', profileId).single();
+    if (!existing) break; // 중복 없음
+    profileId = emailPrefix + suffix;
+    suffix++;
+  }
+  
   await supabase.from('profiles').insert({
     id: profileId,
     user_id: auth.user?.id,

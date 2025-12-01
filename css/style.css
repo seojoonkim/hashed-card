@@ -5,11 +5,22 @@ html, body {
   min-height: 100%; 
   min-height: 100dvh;
   overscroll-behavior: none;
+  /* iOS Safari 전체 화면 배경 확장 */
+  -webkit-touch-callout: none;
 }
 #app {
   min-height: 100%;
   min-height: 100dvh;
 }
+
+/* iOS Safari 배경 확장을 위한 추가 스타일 */
+@supports (padding: env(safe-area-inset-top)) {
+  html, body, #app {
+    /* 배경이 safe area 바깥까지 확장되도록 */
+    min-height: calc(100dvh + env(safe-area-inset-top) + env(safe-area-inset-bottom));
+  }
+}
+
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 2px; }
