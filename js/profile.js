@@ -389,6 +389,9 @@ function showWhatsAppQR(url) {
   modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center';
   modal.style.cssText = 'background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);';
   
+  // QR 이미지 URL (Google Charts API 사용)
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
+  
   modal.innerHTML = `
     <div class="relative flex flex-col items-center p-6">
       <!-- 닫기 버튼 -->
@@ -406,7 +409,9 @@ function showWhatsAppQR(url) {
       </div>
       
       <!-- QR 코드 -->
-      <div id="whatsapp-qr-code" class="bg-white p-4 rounded-2xl shadow-2xl"></div>
+      <div class="bg-white p-4 rounded-2xl shadow-2xl">
+        <img src="${qrImageUrl}" alt="WhatsApp QR" class="w-60 h-60 rounded-xl" />
+      </div>
       
       <!-- 안내 텍스트 -->
       <p class="mt-6 text-white/60 text-sm text-center">Scan to chat on WhatsApp</p>
@@ -427,22 +432,6 @@ function showWhatsAppQR(url) {
   });
   
   document.body.appendChild(modal);
-  
-  // QR 코드 생성
-  const qrContainer = document.getElementById('whatsapp-qr-code');
-  QRCode.toCanvas(url, { 
-    width: 240, 
-    margin: 2,
-    color: { dark: '#000000', light: '#ffffff' }
-  }, (err, canvas) => {
-    if (err) {
-      console.error(err);
-      qrContainer.innerHTML = '<p class="text-red-500">QR 생성 실패</p>';
-      return;
-    }
-    canvas.style.borderRadius = '12px';
-    qrContainer.appendChild(canvas);
-  });
 }
 
 function closeWhatsAppQR() {

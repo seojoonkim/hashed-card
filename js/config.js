@@ -48,6 +48,20 @@ const linkIconCategories = {
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
+function getSocialPlaceholder(key) {
+  const placeholders = {
+    email: 'email@example.com',
+    phone: '+821012345678',
+    whatsapp: '+821012345678',
+    telegram: '@username',
+    website: 'https://...',
+    link2: 'https://...',
+    calendly: 'your-name',
+    mastodon: '@user@instance.social'
+  };
+  return placeholders[key] || '@username';
+}
+
 function showToast(msg, type = 'success') {
   const id = Date.now();
   state.toasts.push({ id, msg, type });

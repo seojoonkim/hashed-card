@@ -435,7 +435,7 @@ function renderMobileEditorPanel(profile) {
               return `
                 <div class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 border border-zinc-100">
                   <div class="w-5 h-5 text-zinc-500 flex-shrink-0">${opt.icon}</div>
-                  <input type="text" id="social-${key}-url" value="${s.url||''}" placeholder="@username" 
+                  <input type="text" id="social-${key}-url" value="${s.url||''}" placeholder="${getSocialPlaceholder(key)}" 
                     oninput="updateSocial('${key}', this.value)"
                     class="flex-1 px-2 py-1.5 rounded-md bg-white border border-zinc-200 text-sm focus:outline-none">
                   <button onclick="removeSocial('${key}')" class="text-zinc-300 hover:text-red-400 text-lg">×</button>
@@ -866,7 +866,7 @@ function renderEditorPanel(profile) {
                    class="flex items-center gap-2 p-2 rounded-lg bg-zinc-50/80 border border-zinc-100 cursor-move hover:border-zinc-200 transition-colors group">
                 <span class="text-zinc-300 cursor-move text-[9px] group-hover:text-zinc-400">⋮⋮</span>
                 <div class="w-4 h-4 text-zinc-500 flex-shrink-0">${opt.icon}</div>
-                <input type="text" id="social-${key}-url" value="${s.url||''}" placeholder="@username" 
+                <input type="text" id="social-${key}-url" value="${s.url||''}" placeholder="${getSocialPlaceholder(key)}" 
                   oninput="updateSocial('${key}', this.value)"
                   class="flex-1 px-2 py-1 rounded-md bg-white border border-zinc-200/60 text-[10px] focus:outline-none focus:border-zinc-300">
                 <button onclick="removeSocial('${key}')" class="text-zinc-300 hover:text-red-400 text-xs transition-colors">×</button>
