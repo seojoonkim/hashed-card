@@ -138,3 +138,81 @@ function handleDrop(e, type, targetIdx) {
   arr.splice(targetIdx, 0, item);
   renderDashboard();
 }
+
+// ==================== QR Code Pre-generation ====================
+async function generateAndUploadQR(profileId, socialType, url) {
+  if (!url) return null;
+  
+  try {
+    // QR 이미지 생성 API 호출
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+    
+    // 이미지를 Blob으로 가져오기
+    const response = await fetch(qrApiUrl);
+    const blob = await response.blob();
+    
+    // 파일명 생성 (profileId_socialType.png)
+    const fileName = `${profileId}_${socialType}.png`;
+    const filePath = `qrcodes/${fileName}`;
+    
+    // Supabase Storage에 업로드 (덮어쓰기)
+    const { data, error } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, blob, { 
+        contentType: 'image/png',
+        upsert: true 
+      });
+    
+    if (error) {
+      console.error('QR upload error:', error);
+      return null;
+    }
+    
+    // Public URL 생성
+    const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+    return urlData.publicUrl + '?t=' + Date.now(); // 캐시 방지
+    
+  } catch (err) {
+    console.error('QR generation error:', err);
+    return null;
+  }
+}
+
+// WhatsApp/Telegram QR 업데이트 (저장 시 호출)
+async function updateSocialQRs(profile) {
+  const socials = profile.socials || {};
+  let updated = false;
+  
+  // WhatsApp QR 생성
+  if (socials.whatsapp?.url) {
+    const waUrl = buildSocialUrl('whatsapp', socials.whatsapp.url);
+    const currentQrUrl = socials.whatsapp.qr_url;
+    
+    // URL이 변경되었거나 QR이 없으면 생성
+    if (!currentQrUrl || socials.whatsapp._urlChanged) {
+      const qrUrl = await generateAndUploadQR(profile.id, 'whatsapp', waUrl);
+      if (qrUrl) {
+        socials.whatsapp.qr_url = qrUrl;
+        delete socials.whatsapp._urlChanged;
+        updated = true;
+      }
+    }
+  }
+  
+  // Telegram QR 생성
+  if (socials.telegram?.url) {
+    const tgUrl = buildSocialUrl('telegram', socials.telegram.url);
+    const currentQrUrl = socials.telegram.qr_url;
+    
+    if (!currentQrUrl || socials.telegram._urlChanged) {
+      const qrUrl = await generateAndUploadQR(profile.id, 'telegram', tgUrl);
+      if (qrUrl) {
+        socials.telegram.qr_url = qrUrl;
+        delete socials.telegram._urlChanged;
+        updated = true;
+      }
+    }
+  }
+  
+  return updated;
+}

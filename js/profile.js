@@ -65,6 +65,9 @@ async function handleSaveProfile() {
     p.links.forEach(l => { if (l.url) l.url = normalizeUrl(l.url); });
   }
   
+  // QR 코드 미리 생성 (WhatsApp/Telegram)
+  await updateSocialQRs(p);
+  
   p.updated_at = new Date().toISOString();
   
   try {
@@ -181,8 +184,9 @@ async function renderCardView(profileId) {
     
     // WhatsApp인 경우 QR 모달 표시
     if (key === 'whatsapp') {
+      const qrUrl = s.qr_url || '';
       return `
-        <button onclick="showWhatsAppQR('${url}')" 
+        <button onclick="showWhatsAppQR('${url}', '${qrUrl}')" 
            class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
            style="color: ${t.text}; background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: ${size}; height: ${size}; flex-shrink: 0;">
           <span style="width: ${iconSize}; height: ${iconSize};">${opt.icon}</span>
@@ -193,8 +197,9 @@ async function renderCardView(profileId) {
     if (key === 'telegram') {
       // URL에서 username만 추출 (https://t.me/xxx, t.me/xxx, @xxx, xxx 모두 처리)
       const username = s.url.replace(/^(https?:\/\/)?(t\.me\/)?@?/, '');
+      const qrUrl = s.qr_url || '';
       return `
-        <button onclick="showTelegramQR('${url}', '${username}')" 
+        <button onclick="showTelegramQR('${url}', '${username}', '${qrUrl}')" 
            class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
            style="color: ${t.text}; background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: ${size}; height: ${size}; flex-shrink: 0;">
           <span style="width: ${iconSize}; height: ${iconSize};">${opt.icon}</span>
@@ -394,15 +399,15 @@ function isColorDark(color) {
 }
 
 // ==================== WhatsApp QR Modal ====================
-function showWhatsAppQR(url) {
+function showWhatsAppQR(url, qrUrl) {
   // 모달 컨테이너 생성
   const modal = document.createElement('div');
   modal.id = 'whatsapp-qr-modal';
   modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center';
   modal.style.cssText = 'background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);';
   
-  // QR 이미지 URL (Google Charts API 사용)
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
+  // 저장된 QR URL이 있으면 사용, 없으면 실시간 생성
+  const qrImageUrl = qrUrl || `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
   
   modal.innerHTML = `
     <div class="relative flex flex-col items-center p-6">
@@ -452,15 +457,15 @@ function closeWhatsAppQR() {
 }
 
 // ==================== Telegram QR Modal ====================
-function showTelegramQR(url, username) {
+function showTelegramQR(url, username, qrUrl) {
   // 모달 컨테이너 생성
   const modal = document.createElement('div');
   modal.id = 'telegram-qr-modal';
   modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center';
   modal.style.cssText = 'background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);';
   
-  // QR 이미지 URL
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
+  // 저장된 QR URL이 있으면 사용, 없으면 실시간 생성
+  const qrImageUrl = qrUrl || `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
   
   modal.innerHTML = `
     <div class="relative flex flex-col items-center p-6">

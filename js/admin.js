@@ -597,8 +597,9 @@ function renderMobilePreviewPanel(profile) {
             
             // WhatsApp인 경우 QR 모달 표시
             if (key === 'whatsapp' && url) {
+              const qrUrl = s.qr_url || '';
               return `
-                <button onclick="showWhatsAppQR('${url}')" class="rounded-full flex items-center justify-center" style="width: ${btnSize}; height: ${btnSize}; background: ${t.btn}; border: 1.5px solid ${t.border};">
+                <button onclick="showWhatsAppQR('${url}', '${qrUrl}')" class="rounded-full flex items-center justify-center" style="width: ${btnSize}; height: ${btnSize}; background: ${t.btn}; border: 1.5px solid ${t.border};">
                   <span style="width: ${iconSize}; height: ${iconSize}; color: ${t.text};">${opt.icon}</span>
                 </button>
               `;
@@ -607,8 +608,9 @@ function renderMobilePreviewPanel(profile) {
             // Telegram인 경우 QR 모달 표시
             if (key === 'telegram' && url) {
               const username = s.url.replace(/^(https?:\/\/)?(t\.me\/)?@?/, '');
+              const qrUrl = s.qr_url || '';
               return `
-                <button onclick="showTelegramQR('${url}', '${username}')" class="rounded-full flex items-center justify-center" style="width: ${btnSize}; height: ${btnSize}; background: ${t.btn}; border: 1.5px solid ${t.border};">
+                <button onclick="showTelegramQR('${url}', '${username}', '${qrUrl}')" class="rounded-full flex items-center justify-center" style="width: ${btnSize}; height: ${btnSize}; background: ${t.btn}; border: 1.5px solid ${t.border};">
                   <span style="width: ${iconSize}; height: ${iconSize}; color: ${t.text};">${opt.icon}</span>
                 </button>
               `;
@@ -999,8 +1001,9 @@ function renderPreviewPanel(profile) {
     
     // WhatsApp인 경우 QR 모달 표시
     if (key === 'whatsapp') {
+      const qrUrl = s.qr_url || '';
       return `
-        <button onclick="showWhatsAppQR('${url}')" 
+        <button onclick="showWhatsAppQR('${url}', '${qrUrl}')" 
            class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
            style="color: ${t.text}; background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: ${size}; height: ${size}; flex-shrink: 0;">
           <span style="width: ${iconSize}; height: ${iconSize};">${opt.icon}</span>
@@ -1010,8 +1013,9 @@ function renderPreviewPanel(profile) {
     // Telegram인 경우 QR 모달 표시
     if (key === 'telegram') {
       const username = s.url.replace(/^(https?:\/\/)?(t\.me\/)?@?/, '');
+      const qrUrl = s.qr_url || '';
       return `
-        <button onclick="showTelegramQR('${url}', '${username}')" 
+        <button onclick="showTelegramQR('${url}', '${username}', '${qrUrl}')" 
            class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
            style="color: ${t.text}; background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: ${size}; height: ${size}; flex-shrink: 0;">
           <span style="width: ${iconSize}; height: ${iconSize};">${opt.icon}</span>
@@ -1297,6 +1301,12 @@ function removeSocial(key) {
 function updateSocial(key, url) {
   if (!state.editingProfile?.socials) return;
   if (!state.editingProfile.socials[key]) state.editingProfile.socials[key] = { enabled: true };
+  
+  // WhatsApp/Telegram URL 변경 시 플래그 설정 (QR 재생성 필요)
+  if ((key === 'whatsapp' || key === 'telegram') && state.editingProfile.socials[key].url !== url) {
+    state.editingProfile.socials[key]._urlChanged = true;
+  }
+  
   state.editingProfile.socials[key].url = url;
   updatePreview();
 }
