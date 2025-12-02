@@ -436,7 +436,7 @@ function renderMobileEditorPanel(profile) {
           
           ${enabledSocials.length < 6 ? `
           <div class="grid grid-cols-4 gap-1.5">
-            ${availableSocials.slice(0, 12).map(key => {
+            ${availableSocials.map(key => {
               const opt = socialOptions[key];
               return `
                 <button onclick="addSocial('${key}')" class="flex items-center justify-center gap-1 px-1.5 py-1.5 rounded-lg bg-zinc-50 border border-zinc-100 text-xs text-zinc-500">
