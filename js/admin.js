@@ -39,8 +39,8 @@ function renderDashboard() {
   const pending = (state.joinRequests || []).filter(r => r.status === 'pending');
 
   $('#app').innerHTML = `
-    <!-- ============ PC Layout (lg+) ============ -->
-    <div class="hidden lg:flex h-screen bg-white">
+    <!-- ============ PC Layout (850px+) ============ -->
+    <div class="dashboard-pc hidden h-screen bg-white">
       
       <!-- Sidebar -->
       <div class="w-44 bg-zinc-50/80 border-r border-zinc-200/60 flex flex-col flex-shrink-0">
@@ -121,7 +121,8 @@ function renderDashboard() {
     </div>
     
     <!-- ============ Mobile Layout ============ -->
-    <div class="lg:hidden flex flex-col h-screen bg-zinc-50">
+    <!-- ============ Mobile Layout (<850px) ============ -->
+    <div class="dashboard-mobile flex flex-col h-screen bg-zinc-50">
       
       <!-- Mobile Header -->
       <div class="flex-shrink-0 px-4 py-3 bg-white border-b border-zinc-200/60 flex items-center justify-between safe-area-top">

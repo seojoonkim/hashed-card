@@ -33,7 +33,7 @@ input::placeholder { color: #c4c4c4; }
 .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
 
 /* Mobile card background fix */
-@media (max-width: 639px) {
+@media (max-width: 849px) {
   .mobile-card {
     background: transparent !important;
   }
@@ -84,3 +84,13 @@ button:active {
 
 .animate-slide-in { animation: slideIn 0.2s ease; }
 @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Custom 850px breakpoint for dashboard */
+@media (max-width: 849px) {
+  .dashboard-pc { display: none !important; }
+  .dashboard-mobile { display: flex !important; }
+}
+@media (min-width: 850px) {
+  .dashboard-pc { display: flex !important; }
+  .dashboard-mobile { display: none !important; }
+}
