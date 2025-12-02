@@ -69,7 +69,10 @@ function renderDashboard() {
             <div class="w-5 h-5 rounded-full bg-zinc-200 overflow-hidden flex-shrink-0">
               ${my.avatar_url ? `<img src="${my.avatar_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-[9px] text-zinc-400">${my.name?.[0] || '?'}</span>`}
             </div>
-            <span class="truncate text-zinc-600 text-[11px]">${my.name || my.id}</span>
+            <div class="flex-1 min-w-0 flex items-center gap-1.5">
+              <span class="truncate text-zinc-600 text-[11px]">${my.name || my.id}</span>
+              ${my.company ? `<span class="truncate text-zinc-400 text-[9px]">${my.company}</span>` : ''}
+            </div>
           </button>
           ` : ''}
           
@@ -88,7 +91,10 @@ function renderDashboard() {
               <div class="w-5 h-5 rounded-full bg-zinc-200 overflow-hidden flex-shrink-0">
                 ${p.avatar_url ? `<img src="${p.avatar_url}" class="w-full h-full object-cover"/>` : `<span class="w-full h-full flex items-center justify-center text-[9px] text-zinc-400">${p.name?.[0] || '?'}</span>`}
               </div>
-              <span class="truncate text-zinc-600 text-[11px]">${p.name || p.id}</span>
+              <div class="flex-1 min-w-0 flex items-center gap-1.5">
+                <span class="truncate text-zinc-600 text-[11px]">${p.name || p.id}</span>
+                ${p.company ? `<span class="truncate text-zinc-400 text-[9px]">${p.company}</span>` : ''}
+              </div>
             </button>
           `).join('')}
           
