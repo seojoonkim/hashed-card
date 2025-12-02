@@ -592,6 +592,18 @@ function renderMobilePreviewPanel(profile) {
         <div class="${socialCount >= 6 ? 'flex justify-between w-full' : 'flex justify-center gap-3'} mb-6">
           ${enabledSocials.map(key => {
             const opt = socialOptions[key];
+            const s = profile.socials?.[key];
+            const url = s?.url ? buildSocialUrl(key, s.url) : '';
+            
+            // WhatsApp인 경우 QR 모달 표시
+            if (key === 'whatsapp' && url) {
+              return `
+                <button onclick="showWhatsAppQR('${url}')" class="rounded-full flex items-center justify-center" style="width: ${btnSize}; height: ${btnSize}; background: ${t.btn}; border: 1.5px solid ${t.border};">
+                  <span style="width: ${iconSize}; height: ${iconSize}; color: ${t.text};">${opt.icon}</span>
+                </button>
+              `;
+            }
+            
             return `
               <div class="rounded-full flex items-center justify-center" style="width: ${btnSize}; height: ${btnSize}; background: ${t.btn}; border: 1.5px solid ${t.border};">
                 <span style="width: ${iconSize}; height: ${iconSize}; color: ${t.text};">${opt.icon}</span>
@@ -974,6 +986,17 @@ function renderPreviewPanel(profile) {
     const url = buildSocialUrl(key, s.url);
     const size = socialCount >= 6 ? '46px' : '50px';
     const iconSize = socialCount >= 6 ? '18px' : '20px';
+    
+    // WhatsApp인 경우 QR 모달 표시
+    if (key === 'whatsapp') {
+      return `
+        <button onclick="showWhatsAppQR('${url}')" 
+           class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
+           style="color: ${t.text}; background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: ${size}; height: ${size}; flex-shrink: 0;">
+          <span style="width: ${iconSize}; height: ${iconSize};">${opt.icon}</span>
+        </button>`;
+    }
+    
     return `
       <a href="${url}" target="_blank" 
          class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
