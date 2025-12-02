@@ -189,6 +189,18 @@ async function renderCardView(profileId) {
         </button>`;
     }
     
+    // Telegram인 경우 QR 모달 표시
+    if (key === 'telegram') {
+      // URL에서 username만 추출 (https://t.me/xxx, t.me/xxx, @xxx, xxx 모두 처리)
+      const username = s.url.replace(/^(https?:\/\/)?(t\.me\/)?@?/, '');
+      return `
+        <button onclick="showTelegramQR('${url}', '${username}')" 
+           class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
+           style="color: ${t.text}; background: ${t.btn}; border: 1.5px solid ${t.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: ${size}; height: ${size}; flex-shrink: 0;">
+          <span style="width: ${iconSize}; height: ${iconSize};">${opt.icon}</span>
+        </button>`;
+    }
+    
     return `
       <a href="${url}" target="_blank" 
          class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 hover:-translate-y-1" 
@@ -436,5 +448,66 @@ function showWhatsAppQR(url) {
 
 function closeWhatsAppQR() {
   const modal = document.getElementById('whatsapp-qr-modal');
+  if (modal) modal.remove();
+}
+
+// ==================== Telegram QR Modal ====================
+function showTelegramQR(url, username) {
+  // 모달 컨테이너 생성
+  const modal = document.createElement('div');
+  modal.id = 'telegram-qr-modal';
+  modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center';
+  modal.style.cssText = 'background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);';
+  
+  // QR 이미지 URL
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
+  
+  modal.innerHTML = `
+    <div class="relative flex flex-col items-center p-6">
+      <!-- 닫기 버튼 -->
+      <button onclick="closeTelegramQR()" class="absolute top-0 right-0 w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+      
+      <!-- Telegram 로고 -->
+      <div class="mb-6">
+        <svg class="w-12 h-12 text-[#0088cc]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+        </svg>
+      </div>
+      
+      <!-- QR 코드 -->
+      <div class="bg-white p-4 rounded-2xl shadow-2xl">
+        <img src="${qrImageUrl}" alt="Telegram QR" class="w-60 h-60 rounded-xl" />
+      </div>
+      
+      <!-- 아이디 표시 -->
+      <p class="mt-6 text-white text-lg font-medium">@${username}</p>
+      
+      <!-- 안내 텍스트 -->
+      <p class="mt-2 text-white/60 text-sm text-center">Scan to chat on Telegram</p>
+      
+      <!-- 바로 열기 버튼 -->
+      <a href="${url}" target="_blank" class="mt-4 px-6 py-3 bg-[#0088cc] text-white rounded-full font-medium text-sm hover:bg-[#006daa] transition-colors flex items-center gap-2">
+        <span>Open Telegram</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+      </a>
+    </div>
+  `;
+  
+  // 배경 클릭 시 닫기
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeTelegramQR();
+  });
+  
+  document.body.appendChild(modal);
+}
+
+function closeTelegramQR() {
+  const modal = document.getElementById('telegram-qr-modal');
   if (modal) modal.remove();
 }
