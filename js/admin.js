@@ -39,8 +39,8 @@ function renderDashboard() {
   const pending = (state.joinRequests || []).filter(r => r.status === 'pending');
 
   $('#app').innerHTML = `
-    <!-- ============ PC Layout (sm+) ============ -->
-    <div class="hidden sm:flex h-screen bg-white">
+    <!-- ============ PC Layout (lg+) ============ -->
+    <div class="hidden lg:flex h-screen bg-white">
       
       <!-- Sidebar -->
       <div class="w-44 bg-zinc-50/80 border-r border-zinc-200/60 flex flex-col flex-shrink-0">
@@ -121,7 +121,7 @@ function renderDashboard() {
     </div>
     
     <!-- ============ Mobile Layout ============ -->
-    <div class="sm:hidden flex flex-col h-screen bg-zinc-50">
+    <div class="lg:hidden flex flex-col h-screen bg-zinc-50">
       
       <!-- Mobile Header -->
       <div class="flex-shrink-0 px-4 py-3 bg-white border-b border-zinc-200/60 flex items-center justify-between safe-area-top">
@@ -372,12 +372,15 @@ function renderMobileEditorPanel(profile) {
         
         <!-- Profile URL/ID -->
         <div class="bg-white rounded-xl border border-zinc-200 p-4">
-          <label class="text-xs font-semibold text-zinc-800 uppercase tracking-wide block mb-2">Profile URL</label>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-semibold text-zinc-800 uppercase tracking-wide">Profile URL</label>
+            <button onclick="toggleEditIdMobile()" id="edit-id-btn-mobile" class="text-xs text-zinc-500 hover:text-zinc-700">Change</button>
+          </div>
           <div class="flex items-center gap-2">
             <span class="text-sm text-zinc-800 font-medium">hashed.live/</span>
-            <input type="text" id="edit-id-mobile" value="${profile.id}" 
+            <input type="text" id="edit-id-mobile" value="${profile.id}" disabled
               oninput="onMobileIdInput(this)"
-              class="flex-1 px-2 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-sm font-mono text-zinc-800 lowercase focus:outline-none focus:border-zinc-400">
+              class="flex-1 px-2 py-1.5 rounded-lg bg-zinc-50 border border-zinc-200 text-sm font-mono text-zinc-800 lowercase focus:outline-none focus:border-zinc-400 disabled:text-zinc-800">
             <button id="save-id-btn-mobile" onclick="handleMobileChangeId()" class="hidden px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs font-medium">Save</button>
           </div>
           <p class="text-[10px] text-zinc-500 mt-1.5">Only lowercase letters, numbers, and hyphens</p>
@@ -1289,6 +1292,22 @@ async function handleChangeId() {
 }
 
 // Mobile ID change functions
+function toggleEditIdMobile() {
+  const inp = $('#edit-id-mobile'), btn = $('#save-id-btn-mobile'), eb = $('#edit-id-btn-mobile');
+  if (inp.disabled) { 
+    inp.disabled = false; 
+    inp.classList.remove('bg-zinc-50'); 
+    inp.focus();
+    eb.textContent = 'Cancel'; 
+  } else { 
+    inp.disabled = true; 
+    inp.classList.add('bg-zinc-50'); 
+    inp.value = state.editingProfile.id; 
+    btn.classList.add('hidden'); 
+    eb.textContent = 'Change'; 
+  }
+}
+
 function onMobileIdInput(input) {
   const oldValue = input.value;
   const newId = oldValue.toLowerCase().replace(/[^a-z0-9-]/g, '');
@@ -1307,7 +1326,7 @@ function onMobileIdInput(input) {
   }
   
   const saveBtn = document.getElementById('save-id-btn-mobile');
-  if (saveBtn) {
+  if (saveBtn && !input.disabled) {
     saveBtn.classList.toggle('hidden', newId === state.editingProfile?.id);
   }
 }
@@ -1316,8 +1335,7 @@ async function handleMobileChangeId() {
   const newId = $('#edit-id-mobile')?.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
   if (!newId) return showToast('Invalid ID', 'error');
   if (newId === state.editingProfile.id) {
-    const saveBtn = document.getElementById('save-id-btn-mobile');
-    if (saveBtn) saveBtn.classList.add('hidden');
+    toggleEditIdMobile();
     return;
   }
   try {
