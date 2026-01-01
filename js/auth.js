@@ -1,12 +1,12 @@
 // ==================== Auth ====================
 async function login(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
 }
 
 async function logout() {
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
   state.currentUser = null;
   state.userRole = null;
   state.userProfile = null;
@@ -14,9 +14,9 @@ async function logout() {
 }
 
 async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return null;
-  const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
+  const { data: profile } = await supabaseClient.from('profiles').select('*').eq('user_id', user.id).single();
   if (profile) {
     state.userProfile = profile;
     state.userRole = profile.role;
@@ -27,12 +27,12 @@ async function getCurrentUser() {
 
 // ==================== Global Invite Code ====================
 async function getGlobalInviteCode() {
-  const { data } = await supabase.from('settings').select('value').eq('key', 'invite_code').single();
+  const { data } = await supabaseClient.from('settings').select('value').eq('key', 'invite_code').single();
   return data?.value || '';
 }
 
 async function setGlobalInviteCode(code) {
-  const { error } = await supabase.from('settings').upsert({ key: 'invite_code', value: code }, { onConflict: 'key' });
+  const { error } = await supabaseClient.from('settings').upsert({ key: 'invite_code', value: code }, { onConflict: 'key' });
   if (error) throw error;
   return code;
 }
@@ -45,7 +45,7 @@ async function validateInviteCode(code) {
 // ==================== Join Requests ====================
 async function getJoinRequests() {
   if (state.userRole !== 'admin') return [];
-  const { data } = await supabase.from('join_requests').select('*').order('created_at', { ascending: false });
+  const { data } = await supabaseClient.from('join_requests').select('*').order('created_at', { ascending: false });
   return data || [];
 }
 
@@ -55,14 +55,14 @@ async function submitJoinRequest(name, email, password, code) {
   if (!valid) throw new Error('Invalid invite code');
   
   // Check if already registered
-  const { data: existingUser } = await supabase.from('profiles').select('id').eq('email', email).single();
+  const { data: existingUser } = await supabaseClient.from('profiles').select('id').eq('email', email).single();
   if (existingUser) throw new Error('Email already registered');
   
   // Check if pending request exists
-  const { data: existingReq } = await supabase.from('join_requests').select('id').eq('email', email).single();
+  const { data: existingReq } = await supabaseClient.from('join_requests').select('id').eq('email', email).single();
   if (existingReq) throw new Error('Request already submitted. Please wait for admin approval.');
   
-  const { data, error } = await supabase.from('join_requests').insert({ 
+  const { data, error } = await supabaseClient.from('join_requests').insert({ 
     name, 
     email, 
     password_hash: password,
@@ -73,11 +73,11 @@ async function submitJoinRequest(name, email, password, code) {
 }
 
 async function approveJoinRequest(requestId) {
-  const { data: req } = await supabase.from('join_requests').select('*').eq('id', requestId).single();
+  const { data: req } = await supabaseClient.from('join_requests').select('*').eq('id', requestId).single();
   if (!req) throw new Error('Request not found');
   
   // Create auth user via signup
-  const { data: auth, error: authError } = await supabase.auth.signUp({ 
+  const { data: auth, error: authError } = await supabaseClient.auth.signUp({ 
     email: req.email, 
     password: req.password_hash,
     options: { data: { name: req.name, role: 'member' } }
@@ -91,13 +91,13 @@ async function approveJoinRequest(requestId) {
   // 중복 체크
   let suffix = 1;
   while (true) {
-    const { data: existing } = await supabase.from('profiles').select('id').eq('id', profileId).single();
+    const { data: existing } = await supabaseClient.from('profiles').select('id').eq('id', profileId).single();
     if (!existing) break; // 중복 없음
     profileId = emailPrefix + suffix;
     suffix++;
   }
   
-  await supabase.from('profiles').insert({
+  await supabaseClient.from('profiles').insert({
     id: profileId,
     user_id: auth.user?.id,
     email: req.email,
@@ -111,16 +111,16 @@ async function approveJoinRequest(requestId) {
   });
   
   // Delete the request after approval (no longer needed)
-  await supabase.from('join_requests').delete().eq('id', requestId);
+  await supabaseClient.from('join_requests').delete().eq('id', requestId);
   return req;
 }
 
 async function rejectJoinRequest(requestId) {
-  await supabase.from('join_requests').delete().eq('id', requestId);
+  await supabaseClient.from('join_requests').delete().eq('id', requestId);
 }
 
 async function deleteJoinRequest(requestId) {
-  await supabase.from('join_requests').delete().eq('id', requestId);
+  await supabaseClient.from('join_requests').delete().eq('id', requestId);
 }
 
 // Legacy compatibility

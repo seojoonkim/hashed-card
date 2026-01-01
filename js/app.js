@@ -75,5 +75,5 @@ async function initApp() {
 }
 
 window.addEventListener('hashchange', handleRoute);
-supabase.auth.onAuthStateChange((e) => { if (e === 'SIGNED_OUT') { state.currentUser = null; renderLogin(); } });
+supabaseClient.auth.onAuthStateChange((e) => { if (e === 'SIGNED_OUT') { state.currentUser = null; renderLogin(); } });
 document.addEventListener('DOMContentLoaded', initApp);

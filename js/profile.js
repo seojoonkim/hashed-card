@@ -1,6 +1,6 @@
 // ==================== Profile ====================
 async function saveProfile(data) {
-  const { data: saved, error } = await supabase.from('profiles').update(data).eq('id', data.id).select().single();
+  const { data: saved, error } = await supabaseClient.from('profiles').update(data).eq('id', data.id).select().single();
   if (error) throw error;
   return saved;
 }
@@ -8,9 +8,9 @@ async function saveProfile(data) {
 async function uploadAvatar(file, profileId) {
   const ext = file.name.split('.').pop();
   const name = `${profileId}-${Date.now()}.${ext}`;
-  const { error } = await supabase.storage.from('avatars').upload(name, file, { upsert: true });
+  const { error } = await supabaseClient.storage.from('avatars').upload(name, file, { upsert: true });
   if (error) throw error;
-  const { data } = supabase.storage.from('avatars').getPublicUrl(name);
+  const { data } = supabaseClient.storage.from('avatars').getPublicUrl(name);
   return data.publicUrl + '?t=' + Date.now();
 }
 
@@ -18,7 +18,7 @@ async function deleteAvatar(url) {
   if (!url) return;
   try {
     const name = url.split('?')[0].split('/').pop();
-    if (name) await supabase.storage.from('avatars').remove([name]);
+    if (name) await supabaseClient.storage.from('avatars').remove([name]);
   } catch (e) { console.log(e); }
 }
 
@@ -131,7 +131,7 @@ async function renderCardView(profileId) {
   
   if (!profile) {
     // DB에서 직접 조회
-    const { data, error } = await supabase.from('profiles').select('*').eq('id', profileId).single();
+    const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', profileId).single();
     profile = data;
   }
   

@@ -1,21 +1,21 @@
 // ==================== Data ====================
 async function getAllProfiles() {
-  const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+  const { data } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
   return data || [];
 }
 
 async function deleteProfile(id) {
-  await supabase.from('profiles').delete().eq('id', id);
+  await supabaseClient.from('profiles').delete().eq('id', id);
 }
 
 async function updateProfileId(oldId, newId) {
-  const { data: existing } = await supabase.from('profiles').select('id').eq('id', newId).single();
+  const { data: existing } = await supabaseClient.from('profiles').select('id').eq('id', newId).single();
   if (existing) throw new Error('ID already taken');
-  const { data: p } = await supabase.from('profiles').select('*').eq('id', oldId).single();
+  const { data: p } = await supabaseClient.from('profiles').select('*').eq('id', oldId).single();
   if (!p) throw new Error('Not found');
   const { id, ...rest } = p;
-  await supabase.from('profiles').insert({ id: newId, ...rest });
-  await supabase.from('profiles').delete().eq('id', oldId);
+  await supabaseClient.from('profiles').insert({ id: newId, ...rest });
+  await supabaseClient.from('profiles').delete().eq('id', oldId);
   return newId;
 }
 
@@ -1552,7 +1552,7 @@ async function handleChangePassword() {
   }
   
   try {
-    const { error } = await supabase.auth.updateUser({ password: newPw });
+    const { error } = await supabaseClient.auth.updateUser({ password: newPw });
     if (error) throw error;
     showToast('Password changed successfully!');
     $('#new-password').value = '';
@@ -1575,7 +1575,7 @@ async function toggleUserRole(profileId, currentRole) {
   if (!confirm(`Are you sure you want to ${action}?`)) return;
   
   try {
-    const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', profileId);
+    const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', profileId);
     if (error) throw error;
     
     // Update local state
